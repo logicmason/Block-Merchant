@@ -111,6 +111,13 @@
 			}
 			return biggestx + 1; //since the shape array starts at zero
 		}
+		function get gminx():int { //witdh of a piece in grid squares
+			var minx = 9;
+			for (var coord in shape) {
+				if (shape[coord][0] < minx) minx = shape[coord][0];
+			}
+			return minx; //since the shape array starts at zero
+		}
 		function get gheight():int { //witdh of a piece in grid squares
 			var biggesty = 0;
 			var smallesty = 9
@@ -167,15 +174,15 @@
 			
 			moveLimiter += moveSpeed;
 			if(moveLimiter > 40 && this.gx+this.gwidth < Board.width && Key.isDown(Keyboard.RIGHT) || Key.isDown(68)) {
-				if(gridhit(this,1,0)) {
+				if(gridhit(shape,1,0)) {
 					
 				} else {
 					gx = gx+1;
 					moveLimiter = 0;
 				 }
 			}
-			if(moveLimiter > 40 && this.gx > 0 && Key.isDown(Keyboard.LEFT) || Key.isDown(65)) {
-				if(gridhit(this,-1,0)) {
+			if(moveLimiter > 40 && this.gx+this.gminx > 0 && Key.isDown(Keyboard.LEFT) || Key.isDown(65)) {
+				if(gridhit(shape,-1,0)) {
 					
 				} else {
 					gx = gx-1;
@@ -183,8 +190,9 @@
 				}
 			}
 			if(moveLimiter > 40 && this.gx > 0 && Key.isDown(Keyboard.UP) || Key.isDown(87)) {
-				if(gridhit(this,-1,0)) {
-					
+				if(gridhit(rotate(),0,0)) {
+					trace("OMG!  Rotational grid hit!!!111!!");
+					//don't rotate the piece!
 				} else {
 					shape = rotate();
 					trace("rotated: ");
@@ -206,7 +214,7 @@
 				trace("completed newBlock " + Block.list.length);
 				return;
 			}
-			if(gridhit(this,0,1)) {
+			if(gridhit(shape,0,1)) {
 				trace("calling solidify at gy = "+gy);
 				solidify();
 				if (gy > 0) {
@@ -254,17 +262,22 @@
 			stage.removeChild(this);
 		}
 		
-		public function gridhit(block, dx, dy):Boolean { // grid-based collision detection
-			for each (var coord in block.shape) {
-									trace("gy: " + gy);
-				if (Board.slots[block.gy+coord[1]+dy][block.gx+coord[0]+dx] == 1) {
-					//trace("gridhit at " + (block.gx+coord[0])+", "+(block.gy+coord[1]));
-					//trace("type: " + type+ "    coords: " + coord);
+		public function gridhit(testshape, dx, dy):Boolean { // grid-based collision detection
+			for each (var coord in testshape) {
+				
+				// check to see if part of the piece is off the grid
+				if ((gy+coord[1]+dy >= Board.height) || 
+					(gy+coord[1]+dy < 0) ||
+					(gx+coord[0]+dx >= Board.width) ||
+					(gx+coord[0]+dx < 0)) return true;
+					
+				if (Board.slots[gy+coord[1]+dy][gx+coord[0]+dx] == 1) {
+					trace("gridhit at " + (gx+coord[0])+", "+(gy+coord[1]));
+					trace("type: " + type+ "    coords: " + coord);
 					return true;
 				}
 				else {
 					//trace("no hit at " + (block.gx+coord[0])+", "+(block.gy+coord[1]));
-					//trace("coords: " + coord);
 				}
 			}
 			//trace("no grid hit");
