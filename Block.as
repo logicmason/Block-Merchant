@@ -15,13 +15,13 @@
 		var _gx:int; // the x position in grid squares rather than pixels
 		var _gwidth;
 		var _gheight;
-		var gravity:Number = 3;
-		var dropspeed:Number = 20;
-		var mvspd:Number;
-		var dropspd:Number;
+		var gravity:Number = 2;
+		var gravityCounter:Number = 0;
+		var dropSpeed:Number = 40;
+		var moveSpeed:Number = 15;
+		var moveLimiter:Number = 0;
 		var lastx:int; //x magnitude of previous movement
 		var xspd:int = 5;
-		var movingto:int = -1;  //carful, 0 is a grid destination, -1 means nowhere
 		
 		public function Block(... rest) { // rest[0] is block type
 			// constructor code
@@ -48,8 +48,10 @@
 					make_shape(0x3333ff, 0x0000ff, shape);
 					break;
 				case "L":	
+					edge_color = 0xcc9933;
+					inner_color = 0x996600;
 					shape = [[0,0], [0,1], [0,2], [1,2]];
-					make_shape(0xcc9933, 0x996600, shape);
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "J":
 					shape = [[1,0], [1,1], [0,2], [1,2]];
@@ -72,8 +74,10 @@
 					make_shape(0xcc3399, 0x990066, shape);
 					break;
 				case "t":
+					edge_color = 0x99cc33;
+					inner_color = 0x669900;
 					shape = [[1,0], [0,1], [1,1], [2,1], [1,2]];
-					make_shape(0x99cc33, 0x669900, shape);
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Y":
 					shape = [[0,0], [2,0], [0,1], [1,1], [2,1], [1,2]];
@@ -89,13 +93,13 @@
 		} // constructor
 		
 		function get gy():int {
-			return ((this.y-Board.top+size/2)/ size);
+			return ((this.y-Board.top)/ size);
 		}
 		function set gy(gy:int):void {
 			this.y = gy * size + Board.top;
 		}
 		function get gx():int {
-			return ((this.x+size/2)/ size);
+			return ((this.x)/ size);
 		}
 		function set gx(gx:int):void {
 			this.x = gx * size;
@@ -109,9 +113,12 @@
 		}
 		function get gheight():int { //witdh of a piece in grid squares
 			var biggesty = 0;
+			var smallesty = 9
 			for (var coord in shape) {
 				if (shape[coord][1] > biggesty) biggesty = shape[coord][1];
+				if (shape[coord][1] < smallesty) smallesty = shape[coord][1];
 			}
+			//return biggesty - smallesty + 1; 
 			return biggesty + 1; //since the shape array starts at zero
 		}
 		
@@ -123,72 +130,80 @@
 		}
 		
 		function make_shape(edge_color:int, inner_color:int, shape:Array) {
+			this.graphics.clear();
 			for (var coord in shape) {
 				square(edge_color, inner_color, shape[coord][0], shape[coord][1]);
 			}
 		}
 		
+		function rotate():Array {
+			var xoff:int;
+			var yoff:int;
+			var newshape:Array = new Array;
+			
+			xoff = gwidth / 2;
+			yoff = gheight / 2;
+			for (var coord in shape) { //use 90 matrix rotation [0 -1]
+														//		[1  0]
+				newshape[coord] = new Array;
+				newshape[coord][0] = (shape[coord][1] - xoff) * -1 + xoff;
+				newshape[coord][1] = shape[coord][0];
+			}
+			return newshape;
+		}
 		function move(e:Event){
 			if (this != BlockMerchant.current) trace ("Oh noes, you forgot to remove a listener!");
 			
 			//keyboard input
 			if((Key.isDown(Keyboard.DOWN) || Key.isDown(83))){
-				this.y += dropspeed;
+				gravityCounter += dropSpeed;
 			} else {
-				this.y = this.y + gravity;
+				gravityCounter += gravity;
 			}
-			//check for completed left-right moves
-			if(movingto >= 0) {// it's moving
-				
-				// it's there within an acceptable margin
-			    if ((Math.abs(x - movingto*size) <= xspd/2)){ 
-					trace("x: " + x + "   movingto: " + movingto + "   size: "+size+"   xspd/2: "+xspd/2);
-					trace("x - movingto*size: " + (x- movingto*size));
-					gx = movingto;
-					movingto = -1
-				}
-				else { //keep moving
-					this.x += lastx;
-				}
+			if (gravityCounter > dropSpeed) {
+				gravityCounter -= dropSpeed;
+				this.gy = this.gy + 1;
 			}
 			
-			if(this.gx+this.gwidth < Board.width && Key.isDown(Keyboard.RIGHT) || Key.isDown(68)) {
+			moveLimiter += moveSpeed;
+			if(moveLimiter > 40 && this.gx+this.gwidth < Board.width && Key.isDown(Keyboard.RIGHT) || Key.isDown(68)) {
 				if(gridhit(this,1,0)) {
-					movingto = -1;
-					this.gx = this.gx;
+					
 				} else {
-					if (movingto >= 0) this.x -= lastx; //undo auto move since user is entering another
-					this.x += xspd
-					lastx = xspd;
-					movingto = gx+1;
+					gx = gx+1;
+					moveLimiter = 0;
 				 }
 			}
-			if(this.x > 0 && Key.isDown(Keyboard.LEFT) || Key.isDown(65)) {
+			if(moveLimiter > 40 && this.gx > 0 && Key.isDown(Keyboard.LEFT) || Key.isDown(65)) {
 				if(gridhit(this,-1,0)) {
-					movingto = -1;
-					this.gx = this.gx;
+					
 				} else {
-					this.x -= xspd;
-					lastx = xspd * -1;
-					movingto = gx-1;
+					gx = gx-1;
+					moveLimiter = 0;
 				}
 			}
-			
-			
-			
-			
-			// see if movement caused a hit, if so undo it
-			if (gridhit(this,0,0)) {
-				this.gx -= xspd / ((xspd*xspd)/xspd);
+			if(moveLimiter > 40 && this.gx > 0 && Key.isDown(Keyboard.UP) || Key.isDown(87)) {
+				if(gridhit(this,-1,0)) {
+					
+				} else {
+					shape = rotate();
+					trace("rotated: ");
+					for (var x in shape) {
+						trace(shape[x]);
+					}
+					make_shape(edge_color, inner_color, shape);
+					moveLimiter = 0;
+				}
 			}
-			
+						
 			
 			//do gravity and dropping
 			if (this.gy+this.gheight >= Board.height) {
-				this.y = Board.bottom-this.height;
-				trace("hit bottom")
+				this.gy = Board.height-this.gheight;
+				trace("hit bottom, calling solidify at gy = "+gy);
 				solidify();
 				newBlock();
+				trace("completed newBlock " + Block.list.length);
 				return;
 			}
 			if(gridhit(this,0,1)) {
@@ -241,7 +256,7 @@
 		
 		public function gridhit(block, dx, dy):Boolean { // grid-based collision detection
 			for each (var coord in block.shape) {
-				trace("check cooord: " + (block.gy+coord[1]+dy));
+									trace("gy: " + gy);
 				if (Board.slots[block.gy+coord[1]+dy][block.gx+coord[0]+dx] == 1) {
 					//trace("gridhit at " + (block.gx+coord[0])+", "+(block.gy+coord[1]));
 					//trace("type: " + type+ "    coords: " + coord);
@@ -257,12 +272,9 @@
 		}
 		public function solidify() {
 			removeEventListener("enterFrame", move);
-			if ((movingto >= 0) && !gridhit(this,movingto-gx,0)) gx = movingto;
-			else gx = gx; //make sure the block is aligned nicely into its grid
-			gy = gy;
 			BlockMerchant.current = null;
 			for each (var coord in shape) {
-				if (gy+coord[1] >= 0) Board.slots[gy+coord[1]][gx+coord[0]] = 1; //if it's not off the top of the board, mark it
+				if (gy+coord[1] >= 0 && (gy+coord[1] < Board.height)) Board.slots[gy+coord[1]][gx+coord[0]] = 1; //if it's not off the top of the board, mark it
 			}
 		}
 	}

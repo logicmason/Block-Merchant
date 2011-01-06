@@ -8,7 +8,7 @@
 	
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["r" , "T", "J"];
+		static var playset:Array = ["L" , "T", "J"];
 		static var current:Block;
 		static var board:Board;
 	
