@@ -13,8 +13,9 @@
 		var type:String;
 		var _gy:int; // the y position in grid squares rather than pixels
 		var _gx:int; // the x position in grid squares rather than pixels
-		var _gwidth;
-		var _gheight;
+		var _gwidth:int;
+		var _gheight:int;
+		var _id:int; // the block's position in Block.list
 		var gravity:Number = 2;
 		var gravityCounter:Number = 0;
 		var dropSpeed:Number = 40;
@@ -32,12 +33,14 @@
 					make_shape(0x3333ff, 0x0000ff, shape);
 					break;
 				case "r":	
-					shape = [[0,0], [0,1], [1,1]];
+					shape = [[2,1], [2,2], [3,2]];
 					make_shape(0x666666, 0x333333, shape);
 					break;
 				case "T":	
-					shape = [[0,0], [1,0], [2,0], [1,1]];
-					make_shape(0x999999, 0x666666, shape);
+					edge_color = 0x999999;
+					inner_color = 0x666666;
+					shape = [[1,2], [2,2], [3,2], [2,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Z":	
 					shape = [[0,0], [0,1], [1,1], [1,2]];
@@ -50,48 +53,68 @@
 				case "L":	
 					edge_color = 0xcc9933;
 					inner_color = 0x996600;
-					shape = [[0,0], [0,1], [0,2], [1,2]];
+					shape = [[2,1], [2,2], [2,3], [3,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "J":
-					shape = [[1,0], [1,1], [0,2], [1,2]];
-					make_shape(0x999933, 0x666600, shape);
+					edge_color = 0x999933;
+					inner_color = 0x666600;
+					shape = [[2,1], [2,2], [1,3], [2,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "l":
-					shape = [[0,0], [0,1], [0,2], [0,3]];
-					make_shape(0xff3333, 0xff0000, shape);
+					edge_color = 0xff3333;
+					inner_color = 0xff0000;
+					shape = [[2,0], [2,1], [2,2], [2,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "O":
-					shape = [[0,0], [0,1], [1,0], [1,1]];
-					make_shape(0x993399, 0x660066, shape);
+					edge_color = 0x993399;
+					inner_color = 0x660066;
+					shape = [[1,1], [1,2], [2,1], [2,2]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "U":
-					shape = [[0,0], [2,0], [0,1], [2,1], [0,2], [1,2], [2,2]];
-					make_shape(0x339999, 0x006666, shape);
+					edge_color = 0x339999;
+					inner_color = 0x006666;
+					shape = [[1,1], [3,1], [1,2], [3,2], [1,3], [2,3], [3,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
-				case "I":
-					shape = [[0,0], [2,0], [0,1], [1,1], [2,1], [0,2], [2,2]];
-					make_shape(0xcc3399, 0x990066, shape);
+				case "H":
+					edge_color = 0xcc3399;
+					inner_color = 0x990066;
+					shape = [[1,1], [3,1], [1,2], [2,2], [3,2], [1,3], [3,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "t":
 					edge_color = 0x99cc33;
 					inner_color = 0x669900;
-					shape = [[1,0], [0,1], [1,1], [2,1], [1,2]];
+					shape = [[2,1], [1,2], [2,2], [3,2], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Y":
+					edge_color = 0xff0000;
+					inner_color = 0x800000;
 					shape = [[0,0], [2,0], [0,1], [1,1], [2,1], [1,2]];
-					make_shape(0xff0000, 0x800000, shape);
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "5":
-					shape = [[0,0], [0,1], [0,2], [0,3], [0,4]];
-					make_shape(0xfee088, 0xFDD017, shape);
+					edge_color = 0xfee088;
+					inner_color = 0xFDD017;
+					shape = [[2,0], [2,1], [2,2], [2,3], [2,4]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 			}//switch
-			addEventListener("enterFrame", move);
+			//addEventListener("enterFrame", move);
 			list.push(this);
 		} // constructor
 		
+		function get id():int {
+			for (var i in Block.list) {
+				if (this == Block.list[i]) return i;
+			}
+			return -1;
+		}
 		function get gy():int {
 			return ((this.y-Board.top)/ size);
 		}
@@ -104,13 +127,7 @@
 		function set gx(gx:int):void {
 			this.x = gx * size;
 		}
-		function get gwidth():int { //witdh of a piece in grid squares
-			var biggestx = 0;
-			for (var coord in shape) {
-				if (shape[coord][0] > biggestx) biggestx = shape[coord][0];
-			}
-			return biggestx + 1; //since the shape array starts at zero
-		}
+		
 		function get gminx():int { //witdh of a piece in grid squares
 			var minx = 9;
 			for (var coord in shape) {
@@ -118,16 +135,34 @@
 			}
 			return minx; //since the shape array starts at zero
 		}
-		function get gheight():int { //witdh of a piece in grid squares
-			var biggesty = 0;
-			var smallesty = 9
+		function get gmaxx():int { //witdh of a piece in grid squares
+			var maxx = 0;
 			for (var coord in shape) {
-				if (shape[coord][1] > biggesty) biggesty = shape[coord][1];
-				if (shape[coord][1] < smallesty) smallesty = shape[coord][1];
+				if (shape[coord][0] > maxx) maxx = shape[coord][0];
 			}
-			//return biggesty - smallesty + 1; 
-			return biggesty + 1; //since the shape array starts at zero
+			return maxx; //since the shape array starts at zero
 		}
+		function get gminy():int { //witdh of a piece in grid squares
+			var miny = 9;
+			for (var coord in shape) {
+				if (shape[coord][1] < miny) miny = shape[coord][1];
+			}
+			return miny; //since the shape array starts at zero
+		}
+		function get gmaxy():int { //witdh of a piece in grid squares
+			var maxy = 0;
+			for (var coord in shape) {
+				if (shape[coord][1] > maxy) maxy = shape[coord][1];
+			}
+			return maxy; //since the shape array starts at zero
+		}
+		function get gwidth():int { //witdh of a piece in grid squares
+			return gmaxx + 1; //since the shape array starts at zero
+		}
+		function get gheight():int {
+			return gmaxy+1;
+		}
+		
 		
 		function square(edge_color:int, inner_color:int, xoff:int, yoff:int) {
 			this.graphics.lineStyle(2,edge_color);
@@ -143,13 +178,27 @@
 			}
 		}
 		
+		function decompose() { // splits a block into a new block for each square
+			for (var coord in shape) {
+				var s = new Block("single");
+				s.gx = gx+shape[coord][0];
+				s.gy = gy+shape[coord][1];
+				stage.addChild(s);
+				s.solidify();
+				trace((gx+shape[coord][0])+", "+(gy+shape[coord][1]));
+			}
+			
+			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
+			this.destroy(); //destroys original block
+		}
 		function rotate():Array {
-			var xoff:int;
-			var yoff:int;
+			var xoff:int = 2; // every block will rotate around 2,2
+			var yoff:int = 2;
+			if (type == "O") return shape; //rotation doesn't change this shape
+			
 			var newshape:Array = new Array;
 			
-			xoff = gwidth / 2;
-			yoff = gheight / 2;
+			
 			for (var coord in shape) { //use 90 matrix rotation [0 -1]
 														//		[1  0]
 				newshape[coord] = new Array;
@@ -158,9 +207,13 @@
 			}
 			return newshape;
 		}
+		
 		function move(e:Event){
-			if (this != BlockMerchant.current) trace ("Oh noes, you forgot to remove a listener!");
-			
+			if (this != BlockMerchant.current) {
+				trace ("Oh noes, you forgot to remove a listener on block " + this.id);
+				if (BlockMerchant.current) trace ("Current block is " + BlockMerchant.current.id);
+				else trace("There is no current block!!!111! 8:o");
+			}
 			//keyboard input
 			if((Key.isDown(Keyboard.DOWN) || Key.isDown(83))){
 				gravityCounter += dropSpeed;
@@ -189,7 +242,7 @@
 					moveLimiter = 0;
 				}
 			}
-			if(moveLimiter > 40 && this.gx > 0 && Key.isDown(Keyboard.UP) || Key.isDown(87)) {
+			if(moveLimiter > 40 && Key.isDown(Keyboard.UP) || Key.isDown(87)) {
 				if(gridhit(rotate(),0,0)) {
 					trace("OMG!  Rotational grid hit!!!111!!");
 					//don't rotate the piece!
@@ -211,7 +264,6 @@
 				trace("hit bottom, calling solidify at gy = "+gy);
 				solidify();
 				newBlock();
-				trace("completed newBlock " + Block.list.length);
 				return;
 			}
 			if(gridhit(shape,0,1)) {
@@ -219,22 +271,27 @@
 				solidify();
 				if (gy > 0) {
 					newBlock();
-					trace("completed newBlock " + Block.list.length);
 				}
 				else {
 					BlockMerchant.gameOver();
 				}
 			}
+			if((moveLimiter > 40 && Key.isDown(Keyboard.SPACE))){
+				decompose();
+				moveLimiter = 0;
+			}
 		}
 		
-		public function newBlock() {
+		public function newBlock() {  //creates a new block of a random type at the top
 			if (BlockMerchant.current == null) {
 				var p = BlockMerchant.playset;
-				var b = new Block(p[Math.floor(Math.random()*p.length)]);
+				var b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
 				stage.addChild(b);
 				b.gx = 7;
 				b.gy = 0;
 				BlockMerchant.current = b;
+				b.addEventListener("enterFrame", b.move);
+				
 				if(gridhit(b,0,0)) {
 					b.kill();
 				} 
@@ -242,6 +299,7 @@
 					trace("ERROR: already have a current block");
 					trace("Current Block trace: " + BlockMerchant.current);
 			}
+			trace("completed newBlock " + Block.list.length);
 
 		}
 		
@@ -253,6 +311,7 @@
 		}
 		
 		function destroy() {
+			if (this ==BlockMerchant.current) BlockMerchant.current = null;
 			removeEventListener("enterFrame", move);
 			for(var i in list){
 				if(list[i] == this){
@@ -269,7 +328,10 @@
 				if ((gy+coord[1]+dy >= Board.height) || 
 					(gy+coord[1]+dy < 0) ||
 					(gx+coord[0]+dx >= Board.width) ||
-					(gx+coord[0]+dx < 0)) return true;
+					(gx+coord[0]+dx < 0)) {
+					trace("rotational grid hit and stuff");
+					return true;
+				}
 					
 				if (Board.slots[gy+coord[1]+dy][gx+coord[0]+dx] == 1) {
 					trace("gridhit at " + (gx+coord[0])+", "+(gy+coord[1]));
@@ -289,6 +351,7 @@
 			for each (var coord in shape) {
 				if (gy+coord[1] >= 0 && (gy+coord[1] < Board.height)) Board.slots[gy+coord[1]][gx+coord[0]] = 1; //if it's not off the top of the board, mark it
 			}
+			trace("block "+this.id + " solidified");
 		}
 	}
 	

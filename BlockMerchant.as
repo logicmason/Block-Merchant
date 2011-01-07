@@ -8,18 +8,14 @@
 	
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["L" , "T", "J"];
+		static var playset:Array = ["U" , "O", "H", "l"];
 		static var current:Block;
 		static var board:Board;
 	
 		public function BlockMerchant() {
 			board = new Board();
 			Key.initialize(stage);
-
-			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
-			stage.addChild(current);
-			current.gx = 4;
-			current.gy = 0;
+			startGame();
 			addEventListener("enterFrame", enterFrame);
 		}
 		static function gameOver() {
@@ -32,15 +28,18 @@
 				b.destroy();
 			}
 			board.initialize();
+		}
+		function startGame() {
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
+			current.addEventListener("enterFrame", current.move);
 			stage.addChild(current);
 			current.gx = 4;
 			current.gy = 0;
-			addEventListener("enterFrame", enterFrame);
 		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
 				clearBoard();
+				startGame();
 			}
 		}
 
