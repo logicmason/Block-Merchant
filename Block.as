@@ -262,27 +262,27 @@
 			if (this.gy+this.gheight >= Board.height) {
 				this.gy = Board.height-this.gheight;
 				trace("hit bottom, calling solidify at gy = "+gy);
-				solidify();
-				newBlock();
+				transition();
 				return;
 			}
 			if(gridhit(shape,0,1)) {
-				trace("calling solidify at gy = "+gy);
-				solidify();
+				trace("calling solidify at gy = "+gy);		
 				if (gy > 0) {
-					newBlock();
+					transition();
 				}
 				else {
+					removeEventListener("enterFrame", move);
 					BlockMerchant.gameOver();
 				}
 			}
 			if((moveLimiter > 40 && Key.isDown(Keyboard.SPACE))){
-				decompose();
+				transition();
 				moveLimiter = 0;
 			}
 		}
 		
 		public function newBlock() {  //creates a new block of a random type at the top
+			
 			if (BlockMerchant.current == null) {
 				var p = BlockMerchant.playset;
 				var b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
@@ -352,6 +352,21 @@
 				if (gy+coord[1] >= 0 && (gy+coord[1] < Board.height)) Board.slots[gy+coord[1]][gx+coord[0]] = 1; //if it's not off the top of the board, mark it
 			}
 			trace("block "+this.id + " solidified");
+		}
+		public function transition() { 
+		//breaks this block into its constituent pieces, updates the board and drops the next block
+			for (var coord in shape) {
+				var s = new Block("single");
+				s.gx = gx+shape[coord][0];
+				s.gy = gy+shape[coord][1];
+				stage.addChild(s);
+				s.removeEventListener("enterFrame", s.move);
+				if (s.gy >= 0 && (s.gy < Board.height)) Board.slots[s.gy][s.gx] = 1;
+				trace((gx+shape[coord][0])+", "+(gy+shape[coord][1]));
+			}
+			BlockMerchant.current = null;
+			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
+			this.destroy(); //destroys original block
 		}
 	}
 	

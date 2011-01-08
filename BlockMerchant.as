@@ -4,8 +4,6 @@
 	import flash.events.Event;
 	import flash.ui.Keyboard;
 	import flash.events.KeyboardEvent;
-	//import flash.utils.Timer;
-	
 	
 	public class BlockMerchant extends MovieClip{
 		static var playset:Array = ["U" , "O", "H", "l"];
@@ -23,12 +21,7 @@
 			board.traceBoard();
 			trace(Block.list.length + "total blocks");
 		}
-		function clearBoard() {
-			for each(var b in Block.list) {
-				b.destroy();
-			}
-			board.initialize();
-		}
+
 		function startGame() {
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
@@ -38,7 +31,7 @@
 		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
-				clearBoard();
+				board.clear();
 				startGame();
 			}
 		}
