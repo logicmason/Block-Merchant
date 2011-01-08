@@ -20,29 +20,61 @@
 		}
 		
 		public function initialize(){
-			for (var i=0; i<height; i++) {
-				slots[i] = new Array();
-				for (var j=0; j<width; j++) {
-					slots[i][j] = 0;
+			for (var y=0; y<height; y++) {
+				slots[y] = new Array();
+				for (var x=0; x<width; x++) {
+					slots[y][x] = 0;
 				}
 			}
 		}
+		public static function checkRows() {
+			for (var row in slots) {
+				if (checkRow(row) == true) clearRow(row);
+			}
+		}
+		public static function checkRow(row:int):Boolean {
+			for each (var point in slots[row]) {
+				if (point == 0) return false;
+			}
+			return true;
+		}
 		
-		public function clear() {
+		public function clean() {
 			for each(var b in Block.list) {
 				b.destroy();
 			}
 			initialize();
 		}
+		
+		public static function clearRow(row:int) {
+			trace("Line "+ row + " is SO cleared... once this function gets written");
+			for each (var b in Block.list) {
+				if (b.gy == row) {
+					b.destroy(); // clear row
+				}
+				if (b.gy < row) {
+					b.gy += 1; //move higher sprites down by one
+				}
+			}
+			
+			//shift existing block data down by one
+			for (var y=row;y>0;y--){
+				for (var x in slots[row]){
+					slots[y][x] = slots[y-1][x];
+				}
+			}
+			for (var i in slots[row]){
+				//slots[row][i] = 0; //clear completed line 
+				slots[row][0] = 0; //make a fresh top row
+			}
+		}
+		
 		function traceBoard() {
 			for (var r in slots) {
 				trace("Row "+r+": " + slots[r]);
 			}
 		}
 		
-		function enterFrame(e:Event){
-			trace("I'm a board!");
-		}
 
 	}
 	

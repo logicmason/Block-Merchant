@@ -6,13 +6,14 @@
 	import flash.events.KeyboardEvent;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["U" , "O", "H", "l"];
+		static var playset:Array = ["t" , "O", "T", "l"];
 		static var current:Block;
 		static var board:Board;
 	
 		public function BlockMerchant() {
 			board = new Board();
 			Key.initialize(stage);
+			board.traceBoard();
 			startGame();
 			addEventListener("enterFrame", enterFrame);
 		}
@@ -31,8 +32,11 @@
 		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
-				board.clear();
+				board.clean();
 				startGame();
+			}
+			if((Key.isDown(84))) {
+				board.traceBoard();
 			}
 		}
 

@@ -226,7 +226,7 @@
 			}
 			
 			moveLimiter += moveSpeed;
-			if(moveLimiter > 40 && this.gx+this.gwidth < Board.width && Key.isDown(Keyboard.RIGHT) || Key.isDown(68)) {
+			if(moveLimiter > 40 && this.gx+this.gwidth < Board.width && (Key.isDown(Keyboard.RIGHT) || Key.isDown(68))) {
 				if(gridhit(shape,1,0)) {
 					
 				} else {
@@ -234,7 +234,7 @@
 					moveLimiter = 0;
 				 }
 			}
-			if(moveLimiter > 40 && this.gx+this.gminx > 0 && Key.isDown(Keyboard.LEFT) || Key.isDown(65)) {
+			if(moveLimiter > 40 && this.gx+this.gminx > 0 && (Key.isDown(Keyboard.LEFT) || Key.isDown(65))) {
 				if(gridhit(shape,-1,0)) {
 					
 				} else {
@@ -242,7 +242,7 @@
 					moveLimiter = 0;
 				}
 			}
-			if(moveLimiter > 40 && Key.isDown(Keyboard.UP) || Key.isDown(87)) {
+			if(moveLimiter > 40 && (Key.isDown(Keyboard.UP) || Key.isDown(87))) {
 				if(gridhit(rotate(),0,0)) {
 					trace("OMG!  Rotational grid hit!!!111!!");
 					//don't rotate the piece!
@@ -311,7 +311,7 @@
 		}
 		
 		function destroy() {
-			if (this ==BlockMerchant.current) BlockMerchant.current = null;
+			if (this == BlockMerchant.current) BlockMerchant.current = null;
 			removeEventListener("enterFrame", move);
 			for(var i in list){
 				if(list[i] == this){
@@ -367,6 +367,7 @@
 			BlockMerchant.current = null;
 			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
 			this.destroy(); //destroys original block
+			Board.checkRows();
 		}
 	}
 	
