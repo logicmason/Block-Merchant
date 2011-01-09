@@ -316,9 +316,11 @@
 			for(var i in list){
 				if(list[i] == this){
 					delete list[i];
+					//list.splice(i,1);
 				}
 			}
 			stage.removeChild(this);
+			trace(list);
 		}
 		
 		public function gridhit(testshape, dx, dy):Boolean { // grid-based collision detection

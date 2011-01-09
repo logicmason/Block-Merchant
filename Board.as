@@ -4,9 +4,9 @@
 	import flash.events.Event;
 	
 	public class Board {
-		static const width:int = 15;
-		static const height:int = 15;
-		static const gridSize:int = 20;
+		static const width:int = 12;
+		static const height:int = 22;
+		static const gridSize:int = 19;
 		static const top:int = 100;
 		static const bottom:int = top+height*gridSize;
 		static var slots:Array = new Array();
@@ -48,12 +48,12 @@
 		
 		public static function clearRow(row:int) {
 			trace("Line "+ row + " is SO cleared... once this function gets written");
-			for each (var b in Block.list) {
-				if (b.gy == row) {
-					b.destroy(); // clear row
+			for (var b in Block.list) {
+				if (Block.list[b].gy == row) {
+					Block.list[b].destroy(); // clear row
 				}
-				if (b.gy < row) {
-					b.gy += 1; //move higher sprites down by one
+				else if (Block.list[b].gy < row) {
+					Block.list[b].gy += 1; //move higher sprites down by one
 				}
 			}
 			

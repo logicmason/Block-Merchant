@@ -6,7 +6,7 @@
 	import flash.events.KeyboardEvent;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["t" , "O", "T", "l"];
+		static var playset:Array = ["U" , "O", "T", "l"];
 		static var current:Block;
 		static var board:Board;
 	
