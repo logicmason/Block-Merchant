@@ -4,6 +4,7 @@
 	import flash.events.Event;
 	import flash.ui.Keyboard;
 	import flash.events.KeyboardEvent;
+	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
 		static var playset:Array = ["L", "J", "S", "Z", "O", "T", "l"];
@@ -12,6 +13,7 @@
 	
 		public function BlockMerchant() {
 			board = new Board();
+			trace(stage);
 			Key.initialize(stage);
 			board.traceBoard();
 			startGame();
@@ -38,6 +40,8 @@
 			if((Key.isDown(84))) {
 				board.traceBoard();
 			}
+			goldDisplay.text = Board.money.toString();
+			scoreDisplay.text = Board.points.toString();
 		}
 
 	}

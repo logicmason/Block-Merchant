@@ -2,17 +2,19 @@
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.text.TextField;
 	
 	public class Board {
-		static const width:int = 12;
+		static const width:int = 13;
 		static const height:int = 22;
 		static const gridSize:int = 19;
-		static const top:int = 100;
+		static const top:int = 112;
 		static const bottom:int = top+height*gridSize;
 		static var slots:Array = new Array();
 		static var cleared:Array = new Array(); // how many singles, doubles, etc.. cleared
 		static var money:int;
 		static var points:int;
+		
 
 		public function Board() {
 			// constructor code
@@ -62,7 +64,6 @@
 		}
 		
 		public static function clearRow(row:int) {
-			trace("Line "+ row + " is SO cleared... once this function gets written");
 			for (var b in Block.list) {
 				if (Block.list[b].gy == row) {
 					Block.list[b].destroy(); // clear row
@@ -97,7 +98,7 @@
 		
 		public static function rewardCleared(rowsCleared:int) {
 			points += rowsCleared * rowsCleared * 100;
-			money += Math.pow(2, (rowsCleared-1));
+			money += Math.pow(2, (rowsCleared-1)) - 1;
 		}
 	}
 	

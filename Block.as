@@ -285,7 +285,7 @@
 				var p = BlockMerchant.playset;
 				var b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
 				stage.addChild(b);
-				b.gx = 7;
+				b.gx = 5;
 				b.gy = 0;
 				BlockMerchant.current = b;
 				b.addEventListener("enterFrame", b.move);
@@ -297,8 +297,6 @@
 					trace("ERROR: already have a current block");
 					trace("Current Block trace: " + BlockMerchant.current);
 			}
-			trace("completed newBlock " + Block.list.length);
-
 		}
 		
 		public function kill() { // only for game ending block
@@ -357,7 +355,7 @@
 				stage.addChild(s);
 				s.removeEventListener("enterFrame", s.move);
 				if (s.gy >= 0 && (s.gy < Board.height)) Board.slots[s.gy][s.gx] = 1;
-				trace((gx+shape[coord][0])+", "+(gy+shape[coord][1]));
+				//trace((gx+shape[coord][0])+", "+(gy+shape[coord][1]));
 			}
 			BlockMerchant.current = null;
 			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
