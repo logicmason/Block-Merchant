@@ -43,12 +43,16 @@
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Z":	
-					shape = [[0,0], [0,1], [1,1], [1,2]];
-					make_shape(0x33ff33, 0x00ff00, shape);
+					edge_color = 0x33ff33;
+					inner_color = 0x00ff00;
+					shape = [[1,1], [1,2], [2,2], [2,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "S":	
-					shape = [[0,1], [1,0], [1,1], [0,2]];
-					make_shape(0x3333ff, 0x0000ff, shape);
+					edge_color = 0x3333ff;
+					inner_color = 0x0000ff;
+					shape = [[1,2], [2,1], [2,2], [1,3]];
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "L":	
 					edge_color = 0xcc9933;
@@ -185,7 +189,6 @@
 				s.gy = gy+shape[coord][1];
 				stage.addChild(s);
 				s.solidify();
-				trace((gx+shape[coord][0])+", "+(gy+shape[coord][1]));
 			}
 			
 			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
@@ -248,10 +251,6 @@
 					//don't rotate the piece!
 				} else {
 					shape = rotate();
-					trace("rotated: ");
-					for (var x in shape) {
-						trace(shape[x]);
-					}
 					make_shape(edge_color, inner_color, shape);
 					moveLimiter = 0;
 				}
@@ -261,12 +260,11 @@
 			//do gravity and dropping
 			if (this.gy+this.gheight >= Board.height) {
 				this.gy = Board.height-this.gheight;
-				trace("hit bottom, calling solidify at gy = "+gy);
+				//trace("hit bottom, calling solidify at gy = "+gy);
 				transition();
 				return;
 			}
 			if(gridhit(shape,0,1)) {
-				trace("calling solidify at gy = "+gy);		
 				if (gy > 0) {
 					transition();
 				}
@@ -320,7 +318,6 @@
 				}
 			}
 			stage.removeChild(this);
-			trace(list);
 		}
 		
 		public function gridhit(testshape, dx, dy):Boolean { // grid-based collision detection
@@ -331,13 +328,10 @@
 					(gy+coord[1]+dy < 0) ||
 					(gx+coord[0]+dx >= Board.width) ||
 					(gx+coord[0]+dx < 0)) {
-					trace("rotational grid hit and stuff");
 					return true;
 				}
 					
 				if (Board.slots[gy+coord[1]+dy][gx+coord[0]+dx] == 1) {
-					trace("gridhit at " + (gx+coord[0])+", "+(gy+coord[1]));
-					trace("type: " + type+ "    coords: " + coord);
 					return true;
 				}
 				else {
@@ -353,7 +347,6 @@
 			for each (var coord in shape) {
 				if (gy+coord[1] >= 0 && (gy+coord[1] < Board.height)) Board.slots[gy+coord[1]][gx+coord[0]] = 1; //if it's not off the top of the board, mark it
 			}
-			trace("block "+this.id + " solidified");
 		}
 		public function transition() { 
 		//breaks this block into its constituent pieces, updates the board and drops the next block

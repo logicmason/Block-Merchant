@@ -10,6 +10,7 @@
 		static const top:int = 100;
 		static const bottom:int = top+height*gridSize;
 		static var slots:Array = new Array();
+		static var cleared:Array = new Array(); // how many singles, doubles, etc.. cleared
 		
 
 		public function Board() {
@@ -26,11 +27,18 @@
 					slots[y][x] = 0;
 				}
 			}
+			for (var i = 0;i>5;i++) cleared[i] = 0;
 		}
 		public static function checkRows() {
+			var rowsCleared:int = 0;
 			for (var row in slots) {
-				if (checkRow(row) == true) clearRow(row);
+				if (checkRow(row) == true) {
+					clearRow(row);
+				rowsCleared += 1;
+				}
 			}
+			trace(rowsCleared+ " rows cleared");
+			return rowsCleared;
 		}
 		public static function checkRow(row:int):Boolean {
 			for each (var point in slots[row]) {
@@ -65,7 +73,7 @@
 			}
 			for (var i in slots[row]){
 				//slots[row][i] = 0; //clear completed line 
-				slots[row][0] = 0; //make a fresh top row
+				slots[0][i] = 0; //make a fresh top row
 			}
 		}
 		
