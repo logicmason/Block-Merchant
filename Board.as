@@ -11,7 +11,8 @@
 		static const bottom:int = top+height*gridSize;
 		static var slots:Array = new Array();
 		static var cleared:Array = new Array(); // how many singles, doubles, etc.. cleared
-		
+		static var money:int;
+		static var points:int;
 
 		public function Board() {
 			// constructor code
@@ -27,7 +28,9 @@
 					slots[y][x] = 0;
 				}
 			}
-			for (var i = 0;i>5;i++) cleared[i] = 0;
+			for (var i = 0;i<5;i++) cleared[i] = 0;
+			money = 0;
+			points = 0;
 		}
 		public static function checkRows() {
 			var rowsCleared:int = 0;
@@ -37,7 +40,11 @@
 				rowsCleared += 1;
 				}
 			}
-			trace(rowsCleared+ " rows cleared");
+			if (rowsCleared > 0) {
+				trace(rowsCleared+ " rows cleared");
+				cleared[rowsCleared] += 1;
+				rewardCleared(rowsCleared);
+			}
 			return rowsCleared;
 		}
 		public static function checkRow(row:int):Boolean {
@@ -81,9 +88,17 @@
 			for (var r in slots) {
 				trace("Row "+r+": " + slots[r]);
 			}
+			trace(cleared[1] + " singles cleared");
+			trace(cleared[2] + " doubles cleared");
+			trace(cleared[3] + " triples cleared");
+			trace(cleared[4] + " quads cleared");
+			trace("points: " + points+"  money: "+money);
 		}
 		
-
+		public static function rewardCleared(rowsCleared:int) {
+			points += rowsCleared * rowsCleared * 100;
+			money += Math.pow(2, (rowsCleared-1));
+		}
 	}
 	
 }
