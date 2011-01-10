@@ -7,7 +7,7 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["L", "J", "S", "Z", "O", "T", "l"];
+		static var playset:Array = ["L", "J", "S", "Z", "O", "T", "l", "5"];
 		static var current:Block;
 		static var board:Board;
 	
@@ -42,6 +42,8 @@
 			}
 			goldDisplay.text = Board.money.toString();
 			scoreDisplay.text = Board.points.toString();
+			levelDisplay.text = Board.level.toString();
+			linesDisplay.text = Board.linesCleared.toString();
 		}
 
 	}

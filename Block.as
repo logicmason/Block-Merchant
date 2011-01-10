@@ -16,7 +16,7 @@
 		var _gwidth:int;
 		var _gheight:int;
 		var _id:int; // the block's position in Block.list
-		var gravity:Number = 2;
+		static var gravity:Number = 2; // just a default for testing
 		var gravityCounter:Number = 0;
 		var dropSpeed:Number = 40;
 		var moveSpeed:Number = 15;

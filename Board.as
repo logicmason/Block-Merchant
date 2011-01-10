@@ -12,6 +12,8 @@
 		static const bottom:int = top+height*gridSize;
 		static var slots:Array = new Array();
 		static var cleared:Array = new Array(); // how many singles, doubles, etc.. cleared
+		static var linesCleared:int; //total lines cleared
+		static var level:int;
 		static var money:int;
 		static var points:int;
 		
@@ -33,13 +35,15 @@
 			for (var i = 0;i<5;i++) cleared[i] = 0;
 			money = 0;
 			points = 0;
+			linesCleared = 0;
+			level = 1;
 		}
 		public static function checkRows() {
 			var rowsCleared:int = 0;
 			for (var row in slots) {
 				if (checkRow(row) == true) {
 					clearRow(row);
-				rowsCleared += 1;
+					rowsCleared += 1;
 				}
 			}
 			if (rowsCleared > 0) {
@@ -97,8 +101,15 @@
 		}
 		
 		public static function rewardCleared(rowsCleared:int) {
+			linesCleared += rowsCleared; //global counter for lines cleared
 			points += rowsCleared * rowsCleared * 100;
 			money += Math.pow(2, (rowsCleared-1)) - 1;
+			if (linesCleared > level *10) endLevel();
+		}
+		
+		public static function endLevel(){
+			level += 1;
+			Block.gravity += 1;
 		}
 	}
 	
