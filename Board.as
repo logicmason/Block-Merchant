@@ -4,7 +4,7 @@
 	import flash.events.Event;
 	import flash.text.TextField;
 	
-	public class Board {
+	public class Board {  // just the playing board part of the game
 		static const width:int = 13;
 		static const height:int = 22;
 		static const gridSize:int = 19;
@@ -13,6 +13,7 @@
 		static var slots:Array = new Array();
 		static var cleared:Array = new Array(); // how many singles, doubles, etc.. cleared
 		static var linesCleared:int; //total lines cleared
+		static var linesRemaining:int; //lines to be cleared before the next level
 		static var level:int;
 		static var money:int;
 		static var points:int;
@@ -37,6 +38,7 @@
 			points = 0;
 			linesCleared = 0;
 			level = 1;
+			linesRemaining = levelCurve();
 		}
 		public static function checkRows() {
 			var rowsCleared:int = 0;
@@ -102,14 +104,20 @@
 		
 		public static function rewardCleared(rowsCleared:int) {
 			linesCleared += rowsCleared; //global counter for lines cleared
+			linesRemaining -= rowsCleared;
 			points += rowsCleared * rowsCleared * 100;
 			money += Math.pow(2, (rowsCleared-1)) - 1;
-			if (linesCleared > level *5) endLevel();
+			if (linesCleared > levelCurve()) endLevel();
+		}
+		
+		public static function levelCurve() {
+			return ((level * level) + level)*5/2;
 		}
 		
 		public static function endLevel(){
 			level += 1;
 			Block.gravity += 1;
+			linesRemaining = levelCurve()-linesCleared;
 		}
 	}
 	

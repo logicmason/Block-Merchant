@@ -7,7 +7,7 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["T", "Y", "O", "l"];
+		static var playset:Array = ["T", "Y", "S", "Z"];
 		static var current:Block;
 		static var board:Board;
 	
@@ -31,6 +31,18 @@
 			stage.addChild(current);
 			current.gx = 4;
 			current.gy = 0;
+			displayPlayset();
+		}
+		
+		function displayPlayset() {
+			for (var i in playset) {
+				var b = new Block(playset[i]);
+				stage.addChild(b);
+				b.height *= .7;
+				b.width *= .7;
+				b.x = 300+100*Math.floor(i/6);
+				b.y = (i%6)*70+70;
+			}
 		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
@@ -44,6 +56,7 @@
 			scoreDisplay.text = Board.points.toString();
 			levelDisplay.text = Board.level.toString();
 			linesDisplay.text = Board.linesCleared.toString();
+			linesRemainingDisplay.text = Board.linesRemaining.toString();
 		}
 
 	}
