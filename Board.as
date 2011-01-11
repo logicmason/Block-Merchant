@@ -104,7 +104,7 @@
 			linesCleared += rowsCleared; //global counter for lines cleared
 			points += rowsCleared * rowsCleared * 100;
 			money += Math.pow(2, (rowsCleared-1)) - 1;
-			if (linesCleared > level *10) endLevel();
+			if (linesCleared > level *5) endLevel();
 		}
 		
 		public static function endLevel(){

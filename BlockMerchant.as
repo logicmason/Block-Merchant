@@ -7,7 +7,7 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["L", "J", "S", "Z", "O", "T", "l", "5"];
+		static var playset:Array = ["T", "Y", "O", "l"];
 		static var current:Block;
 		static var board:Board;
 	

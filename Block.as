@@ -18,7 +18,7 @@
 		var _id:int; // the block's position in Block.list
 		static var gravity:Number = 2; // just a default for testing
 		var gravityCounter:Number = 0;
-		var dropSpeed:Number = 40;
+		var dropSpeed:Number = 60;
 		var moveSpeed:Number = 15;
 		var moveLimiter:Number = 0;
 		var lastx:int; //x magnitude of previous movement
@@ -29,46 +29,54 @@
 			type = rest[0];
 			switch (rest[0]){
 				case "single": 
-					shape = [[0,0]];
-					make_shape(0x3333ff, 0x0000ff, shape);
+					shape = [[0,0]]; // not centered at [2,2] because this is for decomposing blocks
+					if (rest[1]) edge_color = rest[1];
+					if (rest[2]) inner_color = rest[2];
+					else {
+						edge_color = 0x000000;
+						inner_color = 0x333333;
+					}
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "r":	
+					edge_color = 0x555555;
+					inner_color = 0x222222;
 					shape = [[2,1], [2,2], [3,2]];
-					make_shape(0x666666, 0x333333, shape);
+					make_shape(edge_color, inner_color, shape);
 					break;
 				case "T":	
-					edge_color = 0x999999;
-					inner_color = 0x666666;
+					edge_color = 0x888888;
+					inner_color = 0x555555;
 					shape = [[1,2], [2,2], [3,2], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Z":	
 					edge_color = 0x33ff33;
-					inner_color = 0x00ff00;
+					inner_color = 0x00cc00;
 					shape = [[1,1], [1,2], [2,2], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "S":	
 					edge_color = 0x3333ff;
-					inner_color = 0x0000ff;
+					inner_color = 0x0000cc;
 					shape = [[1,2], [2,1], [2,2], [1,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "L":	
-					edge_color = 0xcc9933;
-					inner_color = 0x996600;
+					edge_color = 0x22ee99;
+					inner_color = 0x00bb77;
 					shape = [[2,1], [2,2], [2,3], [3,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "J":
-					edge_color = 0x999933;
-					inner_color = 0x666600;
+					edge_color = 0xbb88bb;
+					inner_color = 0x885588;
 					shape = [[2,1], [2,2], [1,3], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "l":
 					edge_color = 0xff3333;
-					inner_color = 0xff0000;
+					inner_color = 0xee0000;
 					shape = [[2,0], [2,1], [2,2], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
@@ -97,14 +105,14 @@
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "Y":
-					edge_color = 0xff0000;
-					inner_color = 0x800000;
-					shape = [[0,0], [2,0], [0,1], [1,1], [2,1], [1,2]];
+					edge_color = 0x992222;
+					inner_color = 0x660000;
+					shape = [[1,1], [3,1], [1,2], [2,2], [3,2], [2,3]];
 					make_shape(edge_color, inner_color, shape);
 					break;
 				case "5":
-					edge_color = 0xfee088;
-					inner_color = 0xFDD017;
+					edge_color = 0xffe037;
+					inner_color = 0xedc007;
 					shape = [[2,0], [2,1], [2,2], [2,3], [2,4]];
 					make_shape(edge_color, inner_color, shape);
 					break;
@@ -349,7 +357,7 @@
 		public function transition() { 
 		//breaks this block into its constituent pieces, updates the board and drops the next block
 			for (var coord in shape) {
-				var s = new Block("single");
+				var s = new Block("single", edge_color, inner_color);
 				s.gx = gx+shape[coord][0];
 				s.gy = gy+shape[coord][1];
 				stage.addChild(s);
