@@ -66,6 +66,9 @@
 			for each(var b in Block.list) {
 				b.destroy();
 			}
+			for each(b in Block.specialList) {
+				b.destroy();
+			}
 			initialize();
 		}
 		

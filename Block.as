@@ -7,6 +7,7 @@
 	public class Block extends Sprite {
 		static const size:int = Board.gridSize;
 		static var list:Array = [];
+		static var specialList:Array = []; //used for blocks off of the playing board
 		var edge_color:int;
 		var inner_color:int;
 		var shape:Array;
@@ -121,6 +122,14 @@
 			list.push(this);
 		} // constructor
 		
+		function makeSpecial() {
+			for(var i in list){
+				if(list[i] == this){
+					delete list[i];
+					specialList.push(this);
+				}
+			}
+		}
 		function get id():int {
 			for (var i in Block.list) {
 				if (this == Block.list[i]) return i;
@@ -290,8 +299,16 @@
 		public function newBlock() {  //creates a new block of a random type at the top
 			
 			if (BlockMerchant.current == null) {
+				var b:Block;
 				var p = BlockMerchant.playset;
-				var b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
+				if(BlockMerchant.nextBlock) {
+					b = new Block(BlockMerchant.nextBlock);				
+				}
+				else {
+					b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
+				}
+				
+				BlockMerchant.nextBlock = p[Math.floor(Math.random()*p.length)];
 				stage.addChild(b);
 				b.gx = 5;
 				b.gy = 0;
@@ -316,11 +333,16 @@
 		
 		function destroy() {
 			if (this == BlockMerchant.current) BlockMerchant.current = null;
-			removeEventListener("enterFrame", move);
 			for(var i in list){
 				if(list[i] == this){
+					removeEventListener("enterFrame", move);
 					delete list[i];
 					//list.splice(i,1);
+				}
+			}
+			for (i in specialList){
+				if(specialList[i] == this){
+					delete specialList[i];
 				}
 			}
 			stage.removeChild(this);

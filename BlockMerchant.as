@@ -7,8 +7,10 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["T", "Y", "S", "Z"];
+		static var playset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O"];
 		static var current:Block;
+		static var nextBlock:String; //the name of the type of the next block
+		static var nextBlockImage:Block = null; // the display of the next block
 		static var board:Board;
 	
 		public function BlockMerchant() {
@@ -32,22 +34,54 @@
 			current.gx = 4;
 			current.gy = 0;
 			displayPlayset();
+			nextBlock = playset[Math.floor(Math.random()*playset.length)];
+			displayNextBlock();
 		}
 		
+		function displayNextBlock() {
+			if (nextBlock) {
+				//trace("nextBlock is... " + nextBlock);
+				if (nextBlockImage && nextBlockImage.type != nextBlock) {
+					trace("but, nextBlockImage is of type: "+nextBlockImage.type);
+					nextBlockImage.destroy();
+				
+					nextBlockImage = new Block(nextBlock);
+					nextBlockImage.makeSpecial();
+					stage.addChild(nextBlockImage);
+					nextBlockImage.height *= 1;
+					nextBlockImage.width *= 1;
+					nextBlockImage.x = 330;
+					nextBlockImage.y = 40;
+				}
+				if (!nextBlockImage) {
+					nextBlockImage = new Block(nextBlock);
+					nextBlockImage.makeSpecial();
+					stage.addChild(nextBlockImage);
+					//trace("nextBlock image is... " + nextBlockImage);
+					nextBlockImage.height *= 1;
+					nextBlockImage.width *= 1;
+					nextBlockImage.x = 330;
+					nextBlockImage.y = 40;
+				}
+			}
+		}
 		function displayPlayset() {
 			for (var i in playset) {
 				var b = new Block(playset[i]);
+				b.makeSpecial();
 				stage.addChild(b);
 				b.height *= .7;
 				b.width *= .7;
-				b.x = 300+100*Math.floor(i/6);
-				b.y = (i%6)*70+70;
+				b.x = 300+100*(i%2);
+				b.y = Math.floor(i/2)*70+160;
 			}
 		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
 				board.clean();
+				nextBlockImage = null;
 				startGame();
+				
 			}
 			if((Key.isDown(84))) {
 				board.traceBoard();
@@ -57,6 +91,7 @@
 			levelDisplay.text = Board.level.toString();
 			linesDisplay.text = Board.linesCleared.toString();
 			linesRemainingDisplay.text = Board.linesRemaining.toString();
+			displayNextBlock();
 		}
 
 	}
