@@ -5,8 +5,8 @@
 	import flash.text.TextField;
 	
 	public class Board {  // just the playing board part of the game
-		static const width:int = 13;
-		static const height:int = 22;
+		static const width:int = 13; // in grid sqaures
+		static const height:int = 22;//
 		static const gridSize:int = 19;
 		static const top:int = 112;
 		static const bottom:int = top+height*gridSize;

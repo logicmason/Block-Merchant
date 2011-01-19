@@ -149,33 +149,33 @@
 			this.x = gx * size;
 		}
 		
-		function get gminx():int { //witdh of a piece in grid squares
+		function get gminx():int { 
 			var minx = 9;
 			for (var coord in shape) {
 				if (shape[coord][0] < minx) minx = shape[coord][0];
 			}
-			return minx; //since the shape array starts at zero
+			return minx; 
 		}
-		function get gmaxx():int { //witdh of a piece in grid squares
+		function get gmaxx():int { 
 			var maxx = 0;
 			for (var coord in shape) {
 				if (shape[coord][0] > maxx) maxx = shape[coord][0];
 			}
-			return maxx; //since the shape array starts at zero
+			return maxx; 
 		}
-		function get gminy():int { //witdh of a piece in grid squares
+		function get gminy():int { 
 			var miny = 9;
 			for (var coord in shape) {
 				if (shape[coord][1] < miny) miny = shape[coord][1];
 			}
-			return miny; //since the shape array starts at zero
+			return miny; 
 		}
-		function get gmaxy():int { //witdh of a piece in grid squares
+		function get gmaxy():int { 
 			var maxy = 0;
 			for (var coord in shape) {
 				if (shape[coord][1] > maxy) maxy = shape[coord][1];
 			}
-			return maxy; //since the shape array starts at zero
+			return maxy; 
 		}
 		function get gwidth():int { //witdh of a piece in grid squares
 			return gmaxx + 1; //since the shape array starts at zero

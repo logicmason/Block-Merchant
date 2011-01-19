@@ -7,7 +7,8 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var playset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O"];
+		static var masterset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O"];
+		static var playset:Array = [];
 		static var current:Block;
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
@@ -26,8 +27,19 @@
 			board.traceBoard();
 			trace(Block.list.length + "total blocks");
 		}
-
+		
+		function randomizePlayset() {
+			playset = [];
+			var master = masterset.concat();
+			for (var i = 0; i<6; i++) {
+				var r = Math.floor(Math.random()*master.length);
+				var piece = master[r];
+				master.splice(r,1);
+				playset.push(piece);
+			}
+		}
 		function startGame() {
+			randomizePlayset();
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
 			stage.addChild(current);
