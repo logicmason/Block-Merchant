@@ -6,7 +6,7 @@
 	
 	public class Board {  // just the playing board part of the game
 		static const width:int = 13; // in grid sqaures
-		static const height:int = 22;//
+		static const height:int = 22;
 		static const gridSize:int = 19;
 		static const top:int = 112;
 		static const bottom:int = top+height*gridSize;
@@ -63,23 +63,34 @@
 		}
 		
 		public function clean() {
+			var destroyList:Array = new Array;
 			for each(var b in Block.list) {
-				b.destroy();
+				destroyList.push(b);
+				//b.destroy();
 			}
 			for each(b in Block.specialList) {
+				destroyList.push(b);
+				//b.destroy();
+			}
+			for each (b in destroyList) {
 				b.destroy();
 			}
 			initialize();
 		}
 		
 		public static function clearRow(row:int) {
+			var destroyList:Array = new Array;
 			for (var b in Block.list) {
 				if (Block.list[b].gy == row) {
-					Block.list[b].destroy(); // clear row
+					destroyList.push(Block.list[b]);
+					//Block.list[b].destroy(); // clear row
 				}
 				else if (Block.list[b].gy < row) {
 					Block.list[b].gy += 1; //move higher sprites down by one
 				}
+			}
+			for each (b in destroyList) {
+				b.destroy();
 			}
 			
 			//shift existing block data down by one

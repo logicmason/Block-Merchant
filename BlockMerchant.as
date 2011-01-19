@@ -7,8 +7,8 @@
 	import flash.text.TextField;
 	
 	public class BlockMerchant extends MovieClip{
-		static var masterset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O"];
-		static var playset:Array = [];
+		static var masterset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O", "r", "t", "H"];
+		static var playset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O", "r", "t", "H"];
 		static var current:Block;
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
@@ -47,34 +47,22 @@
 			current.gy = 0;
 			displayPlayset();
 			nextBlock = playset[Math.floor(Math.random()*playset.length)];
-			displayNextBlock();
+			//displayNextBlock();
 		}
 		
 		function displayNextBlock() {
 			if (nextBlock) {
 				//trace("nextBlock is... " + nextBlock);
-				if (nextBlockImage && nextBlockImage.type != nextBlock) {
-					trace("but, nextBlockImage is of type: "+nextBlockImage.type);
+				if (nextBlockImage) {
 					nextBlockImage.destroy();
-				
-					nextBlockImage = new Block(nextBlock);
-					nextBlockImage.makeSpecial();
-					stage.addChild(nextBlockImage);
-					nextBlockImage.height *= 1;
-					nextBlockImage.width *= 1;
-					nextBlockImage.x = 330;
-					nextBlockImage.y = 40;
 				}
-				if (!nextBlockImage) {
-					nextBlockImage = new Block(nextBlock);
-					nextBlockImage.makeSpecial();
-					stage.addChild(nextBlockImage);
-					//trace("nextBlock image is... " + nextBlockImage);
-					nextBlockImage.height *= 1;
-					nextBlockImage.width *= 1;
-					nextBlockImage.x = 330;
-					nextBlockImage.y = 40;
-				}
+				nextBlockImage = new Block(nextBlock);
+				nextBlockImage.makeSpecial();
+				stage.addChild(nextBlockImage);
+				nextBlockImage.height *= 1;
+				nextBlockImage.width *= 1;
+				nextBlockImage.x = 330;
+				nextBlockImage.y = 40;
 			}
 		}
 		function displayPlayset() {
