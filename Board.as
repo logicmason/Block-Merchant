@@ -121,17 +121,11 @@
 			linesRemaining -= rowsCleared;
 			points += rowsCleared * rowsCleared * 100;
 			money += Math.pow(2, (rowsCleared-1)) - 1;
-			if (linesCleared > levelCurve()) endLevel();
+			if (linesCleared >= levelCurve()) BlockMerchant.endLevel();
 		}
 		
 		public static function levelCurve() {
-			return ((level * level) + level)*5/2;
-		}
-		
-		public static function endLevel(){
-			level += 1;
-			Block.gravity += 1;
-			linesRemaining = levelCurve()-linesCleared;
+			return ((level * level) + level)*5/2-4;
 		}
 	}
 	

@@ -13,9 +13,14 @@
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
 		static var board:Board;
+		static var shop:MovieClip;
 	
 		public function BlockMerchant() {
 			board = new Board();
+			shop = new Shop();
+			shop.x = 0;
+			shop.y = 112;
+			stage.addChild(shop);
 			trace(stage);
 			Key.initialize(stage);
 			board.traceBoard();
@@ -39,6 +44,7 @@
 			}
 		}
 		function startGame() {
+			shop.visible = false;
 			randomizePlayset();
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
@@ -66,6 +72,7 @@
 			}
 		}
 		function displayPlayset() {
+			clearPlayset();
 			for (var i in playset) {
 				var b = new Block(playset[i]);
 				b.makeSpecial();
@@ -76,6 +83,28 @@
 				b.y = Math.floor(i/2)*70+160;
 			}
 		}
+		function clearPlayset(){
+			var destroyList:Array = new Array;
+			for each(var b in Block.specialList) {
+				destroyList.push(b);
+				//b.destroy();
+			}
+			for each (b in destroyList) {
+				b.destroy();
+			}
+		}
+		static function endLevel(){
+			Board.level += 1;
+			Block.gravity += 1;
+			Board.linesRemaining = Board.levelCurve()-Board.linesCleared;
+			current.removeEventListener("enterFrame", current.move);
+			shop.visible = true;
+		}
+		function nextLevel()  {
+			shop.visible = false;
+			displayPlayset();
+			current.addEventListener("enterFrame", current.move);
+		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
 				board.clean();
@@ -83,8 +112,11 @@
 				startGame();
 				
 			}
-			if((Key.isDown(84))) {
+			if((Key.isDown(84))) { //t
 				board.traceBoard();
+			}
+			if((shop.visible == true) && (Key.isDown(78))) { //
+				nextLevel();
 			}
 			goldDisplay.text = Board.money.toString();
 			scoreDisplay.text = Board.points.toString();
