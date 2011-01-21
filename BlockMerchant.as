@@ -83,7 +83,7 @@
 				b.y = Math.floor(i/2)*70+160;
 			}
 		}
-		function clearPlayset(){
+		static function clearPlayset(){
 			var destroyList:Array = new Array;
 			for each(var b in Block.specialList) {
 				destroyList.push(b);
@@ -98,6 +98,7 @@
 			Block.gravity += 1;
 			Board.linesRemaining = Board.levelCurve()-Board.linesCleared;
 			current.removeEventListener("enterFrame", current.move);
+			clearPlayset();
 			shop.visible = true;
 		}
 		function nextLevel()  {

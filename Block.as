@@ -345,7 +345,6 @@
 					delete specialList[i];
 				}
 			}
-			trace (this.parent);
 			if (this.parent && this.parent == stage) stage.removeChild(this);
 		}
 		
