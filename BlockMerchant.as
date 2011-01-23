@@ -103,6 +103,7 @@
 		}
 		function nextLevel()  {
 			shop.visible = false;
+			shop.salesDisplayed = false;
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
 		}
