@@ -104,6 +104,7 @@
 		function nextLevel()  {
 			shop.visible = false;
 			shop.salesDisplayed = false;
+			shop.clearText();
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
 		}
