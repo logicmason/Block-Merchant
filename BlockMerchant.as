@@ -19,7 +19,7 @@
 			board = new Board();
 			shop = new Shop();
 			shop.x = 0;
-			shop.y = 112;
+			shop.y = 530-shop.height;
 			stage.addChild(shop);
 			trace(stage);
 			Key.initialize(stage);
@@ -64,7 +64,7 @@
 				}
 				nextBlockImage = new Block(nextBlock);
 				nextBlockImage.makeSpecial();
-				stage.addChild(nextBlockImage);
+				addChild(nextBlockImage);
 				nextBlockImage.height *= 1;
 				nextBlockImage.width *= 1;
 				nextBlockImage.x = 330;
@@ -87,6 +87,7 @@
 			var destroyList:Array = new Array;
 			for each(var b in Block.specialList) {
 				destroyList.push(b);
+				//b.parent.removeChild(b);
 				//b.destroy();
 			}
 			for each (b in destroyList) {
@@ -100,11 +101,13 @@
 			current.removeEventListener("enterFrame", current.move);
 			clearPlayset();
 			shop.visible = true;
+			shop.parent.setChildIndex(shop, shop.parent.numChildren-1);
 		}
 		function nextLevel()  {
 			shop.visible = false;
 			shop.salesDisplayed = false;
 			shop.clearText();
+			stage.removeChild(shop.dealBubble);
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
 		}

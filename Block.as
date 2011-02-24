@@ -345,7 +345,8 @@
 					delete specialList[i];
 				}
 			}
-			if (this.parent && this.parent == stage) stage.removeChild(this);
+			//if (this.parent && this.parent == stage) stage.removeChild(this);
+			if (this.parent) this.parent.removeChild(this);
 		}
 		
 		public function gridhit(testshape, dx, dy):Boolean { // grid-based collision detection

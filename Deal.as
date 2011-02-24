@@ -1,0 +1,105 @@
+﻿package  {
+	import flash.display.MovieClip;
+	import flash.events.Event;
+	import flash.ui.Keyboard;
+	import flash.events.KeyboardEvent;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	
+	public class Deal extends MovieClip{
+		var textList:Array = [];
+		static var list:Array = [];
+		var shop:Shop;
+		var placement:int;
+		var additions:Array;
+		var removals:Array;
+		var price:int;
+		var saleText:TextField;
+		var costText:TextField;
+		var components:Array = [];
+		var pressTimer:int = 0;
+		
+		
+		public function Deal(_additions:Array, _removals:Array, _price:int, _placement:int, _shop:Shop) {
+			// constructor code
+			additions = _additions;
+			removals = _removals;
+			price = _price;
+			shop = _shop;
+			placement = _placement;
+			shop.parent.addChild(this); //shop.parent is stage
+			saleText = new TextField();
+			saleText.defaultTextFormat = Shop.salesFormat;
+			saleText.x = 310;
+			saleText.y = placement*50+87;
+			saleText.text = String(placement+")");
+			shop.textList.push(saleText);
+			stage.addChild(saleText); 
+			costText = new TextField();
+			costText.defaultTextFormat = Shop.salesFormat;
+			costText.x = 425;
+			costText.y = saleText.y;
+			costText.text = price.toString();
+			shop.textList.push(costText);
+			stage.addChild(costText);
+			
+			for (var a in additions) {
+				var b = new Block(additions[a]);
+				b.makeSpecial(); //so these blocks will be destroyed by clearPlayset() upon leaving shop
+				stage.addChild(b);
+				b.height *= .5;
+				b.width *= .5;
+				b.x = 325+ 50*a;
+				b.y = 75+placement*50;
+				components.push(b);
+			}
+			
+			for (var r in removals) {
+				b = new Block(removals[r]);
+				b.makeSpecial(); //so these blocks will be destroyed by clearPlayset()
+				stage.addChild(b);
+				b.height *= .5;
+				b.width *= .5;
+				b.x = 325+ 50* additions.length+50*r;
+				b.y = 75+placement*50;
+				components.push(b);
+			}
+			addEventListener("enterFrame", enterFrame);
+		}
+		
+		function destroy() {
+			for (var i in components){
+				trace("destroying " +components[i]);
+				components[i].destroy();
+				delete components[i];
+			}
+			removeEventListener("enterFrame", enterFrame);
+			if (this.parent && this.parent == stage) stage.removeChild(this);
+		}
+		function enterFrame(e:Event) {
+			if (pressTimer > 0) pressTimer -= 1;
+			if((saleText.visible == true) && (Key.isDown(48+placement)) && pressTimer == 0) { //the number key for this deal
+				pressTimer = 60;
+				if(Board.money < price) {
+					trace("you ain't got that kind of cash, jones");
+					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
+				}
+				else {
+					Board.money -= price;
+					for each (var p in additions) {
+						shop.addPiece(p);
+					}
+					for each (p in removals) {
+						shop.removePiece(p);
+					}
+					destroy();
+					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
+					saleText.visible= false;
+					costText.visible= false;
+					return;
+				}
+			}
+		}
+	}
+	
+}
