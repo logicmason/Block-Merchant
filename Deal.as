@@ -77,12 +77,15 @@
 			if (this.parent && this.parent == stage) stage.removeChild(this);
 		}
 		function enterFrame(e:Event) {
+			if(shop.visible == false) destroy();
+			
 			if (pressTimer > 0) pressTimer -= 1;
 			if((saleText.visible == true) && (Key.isDown(48+placement)) && pressTimer == 0) { //the number key for this deal
 				pressTimer = 60;
+				trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
 				if(Board.money < price) {
-					trace("you ain't got that kind of cash, jones");
 					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
+					shop.greeting.appendText("Choose again or go on to the n)ext level.");
 				}
 				else {
 					Board.money -= price;
@@ -94,6 +97,7 @@
 					}
 					destroy();
 					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
+					shop.greeting.appendText("\nPress n for n)ext level when you're done.");
 					saleText.visible= false;
 					costText.visible= false;
 					return;

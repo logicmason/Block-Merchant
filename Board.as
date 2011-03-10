@@ -34,7 +34,7 @@
 				}
 			}
 			for (var i = 0;i<5;i++) cleared[i] = 0;
-			money = 0;
+			money = 10;
 			points = 0;
 			linesCleared = 0;
 			level = 1;

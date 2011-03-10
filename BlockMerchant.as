@@ -5,6 +5,7 @@
 	import flash.ui.Keyboard;
 	import flash.events.KeyboardEvent;
 	import flash.text.TextField;
+	import flash.text.TextFormat;
 	
 	public class BlockMerchant extends MovieClip{
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O", "r", "t", "H"];
@@ -14,6 +15,14 @@
 		static var nextBlockImage:Block = null; // the display of the next block
 		static var board:Board;
 		static var shop:MovieClip;
+		static var pigPic:MovieClip;
+		static var gameOverMessage:TextField;
+		static var gameOverMessageFormat = new TextFormat();
+		
+		static var music1 = new ComfortMusic();
+		static var musicShopA = new ShoppeA();
+		static var musicShopB = new ShoppeB();
+		static var musicChannel;
 	
 		public function BlockMerchant() {
 			board = new Board();
@@ -21,16 +30,35 @@
 			shop.x = 0;
 			shop.y = 530-shop.height;
 			stage.addChild(shop);
-			trace(stage);
+			pigPic = new PigPic();
+			pigPic.x = 20;
+			pigPic.y = 55;
+			stage.addChild(pigPic);
+			gameOverMessage = new TextField();
+			gameOverMessage.x = 70;
+			gameOverMessage.y = 75;
+			gameOverMessage.width = 160;
+			gameOverMessageFormat.size = 14;
+			gameOverMessage.defaultTextFormat = gameOverMessageFormat;
+			gameOverMessage.text = "Press ENTER to play again!";
+			addChild(gameOverMessage);
+			
 			Key.initialize(stage);
 			board.traceBoard();
 			startGame();
 			addEventListener("enterFrame", enterFrame);
 		}
+		static function loopMusic(music) {
+			if (musicChannel) { musicChannel.stop();}
+			musicChannel = music.play(0,1000);
+		}
 		static function gameOver() {
 			trace("Game Over, no extra life!");
+			pigPic.visible = true;
+			gameOverMessage.visible = true;
 			board.traceBoard();
 			trace(Block.list.length + "total blocks");
+			musicChannel.stop();
 		}
 		
 		function randomizePlayset() {
@@ -45,6 +73,8 @@
 		}
 		function startGame() {
 			shop.visible = false;
+			pigPic.visible = false;
+			gameOverMessage.visible = false;
 			randomizePlayset();
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
@@ -53,7 +83,7 @@
 			current.gy = 0;
 			displayPlayset();
 			nextBlock = playset[Math.floor(Math.random()*playset.length)];
-			//displayNextBlock();
+			loopMusic(music1);
 		}
 		
 		function displayNextBlock() {
@@ -102,17 +132,28 @@
 			clearPlayset();
 			shop.visible = true;
 			shop.parent.setChildIndex(shop, shop.parent.numChildren-1);
+			
+			if (musicChannel) { musicChannel.stop();}
+			musicChannel = musicShopA.play();
+			if(!musicChannel.hasEventListener(Event.SOUND_COMPLETE)) {
+				musicChannel.addEventListener( Event.SOUND_COMPLETE, musicComplete );
+			}
+			
 		}
-		function nextLevel()  {
+		static function musicComplete (e : Event) : void {
+			loopMusic(musicShopB);
+    	}
+		function nextLevel()  {  // may only be called from shop after deals have been displayed
 			shop.visible = false;
-			shop.salesDisplayed = false;
+			shop.dealsDisplayed = false;
 			shop.clearText();
 			stage.removeChild(shop.dealBubble);
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
+			loopMusic(music1);
 		}
 		function enterFrame(e:Event){
-			if((Key.isDown(Keyboard.ENTER))) {
+			if((Key.isDown(Keyboard.ENTER)) && (gameOverMessage.visible == true)) {
 				board.clean();
 				nextBlockImage = null;
 				startGame();
@@ -121,7 +162,7 @@
 			if((Key.isDown(84))) { //t
 				board.traceBoard();
 			}
-			if((shop.visible == true) && (Key.isDown(78))) { //
+			if((shop.visible == true) && (shop.dealsDisplayed == true) && (Key.isDown(78))) { //n
 				nextLevel();
 			}
 			goldDisplay.text = Board.money.toString();

@@ -9,7 +9,7 @@
 	import flash.display.Sprite;
 	
 	public class Shop extends MovieClip{
-		var salesDisplayed:Boolean = false;
+		var dealsDisplayed:Boolean = false;
 		var deals:Array = [];
 		var textList:Array = [];
 		var textFormatList:Array = [];
@@ -23,7 +23,20 @@
 									[["T","O"], 4],
 									[["U","5"], 7]
 									];
-
+		var masterSaleList:Array = [[["r"], 1],
+									[["T"], 2],
+									[["Z"], 3],
+									[["S"], 3],
+									[["L"], 2],
+									[["J"], 2],
+									[["l"], 1],
+									[["O"], 2],
+									[["U"], 4],
+									[["H"], 5],
+									[["t"], 6],
+									[["Y"], 4],
+									[["5"], 3]
+									];
 		public function Shop() {
 			// constructor code
 			salesFormat.size = 15;
@@ -50,6 +63,7 @@
 				stage.removeChild(textList[i]);
 				delete(textList[i]);
 			}
+			trace(textList);
 			textList = [];
 		}
 		public function drawDealBubble(s:Sprite, numDeals:int) {
@@ -65,11 +79,9 @@
 		public function prepareDeals() {
 			deals = [];
 			for (var deal in masterDealList) {
-				trace("deal: " + deal);
-				
 				if ((BlockMerchant.playset.indexOf(masterDealList[deal][0][0]) == -1) &&
 					(BlockMerchant.playset.indexOf(masterDealList[deal][0][1]) == -1))
-					deals.push(masterDealList[deal]);
+					deals.push([masterDealList[deal][0],[],masterDealList[deal][1]]);
 			}
 
 			//if ((BlockMerchant.playset.indexOf("L") == -1) &&
@@ -77,34 +89,56 @@
 				//deals.push([["L", "J"], 5]);
 				trace("Current deals: " + deals);
 		}
-		function enterFrame(e:Event){
-			var numDeals = 2;
-			gold.text = Board.money.toString();
-			if((this.visible == true) && (salesDisplayed == false)) {
-				trace("displaying sale");
-				greeting.text = "Oink! Oink!  Welcome to my block shop!";
-				greeting.appendText("\nPress a number key to buy or sell.");
-				
-				prepareDeals();
-				drawDealBubble(dealBubble,deals.length);
-				var costText = new TextField();
-				costText.defaultTextFormat = salesFormat;
-				costText.y = 110;
-				costText.x = 415;
-				costText.text = "Cost";
-				textList.push(costText);
-				stage.addChild(costText);
-				
-				trace(deals.length + " deals");
-				trace(deals);
-				for (var deal in deals) {
-					
-					new Deal(deals[deal][0], [], deals[deal][1], deal+1, this); // additions, removals, price, position, shop
+		public function prepareSales() {
+			deals = [];
+			for (var sale in masterSaleList) {
+				if ((BlockMerchant.playset.indexOf(masterSaleList[sale][0][0]) != -1)) {
+					deals.push([[], masterSaleList[sale][0], masterSaleList[sale][1]]);
 				}
 				
-
-				//new Deal(["T"], ["H", "Y", "t"], 5, 1, this);
-				salesDisplayed = true;
+				
+			}
+			trace("Current sales: " + deals);
+		}
+		function enterFrame(e:Event){
+			gold.text = Board.money.toString();
+			if((this.visible == true) && (dealsDisplayed == false)) {
+				deals = [];
+				greeting.text = "Oink! Oink!  Welcome to my block shop!";
+				greeting.appendText("\nWould you like to b)uy or s)ell?");
+				//greeting.appendText("\nPress a number key to buy or sell.");
+				
+				if((Key.isDown(66))) { //b
+					greeting.text = "Press a number key to buy a pack of blocks";
+					greeting.appendText("\nor press n for n)ext level.");
+					prepareDeals();
+				}
+				if((Key.isDown(83))) { //s
+					greeting.text = "Press a number key to sell one of your blocks";
+					greeting.appendText("\nor press n for n)ext level.");
+					prepareSales();
+				}
+				
+				if (deals.length > 0) {
+					drawDealBubble(dealBubble,deals.length);
+					var costText = new TextField();
+					costText.defaultTextFormat = salesFormat;
+					costText.y = 110;
+					costText.x = 415;
+					costText.text = "Cost";
+					textList.push(costText);
+					stage.addChild(costText);
+					
+					trace(deals.length + " deals");
+					trace(deals);
+					for (var deal in deals) {
+						//new Deal(deals[deal][0], [], deals[deal][1], deal+1, this); // additions, removals, price, position, shop
+						new Deal(deals[deal][0], deals[deal][1], deals[deal][2], deal+1, this); // additions, removals, price, position, shop
+					}
+	
+					//new Deal(["T"], ["H", "Y", "t"], 5, 1, this);
+					dealsDisplayed = true;
+				}
 			}
 		}
 
