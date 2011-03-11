@@ -15,13 +15,16 @@
 		var textFormatList:Array = [];
 		static var salesFormat = new TextFormat();
 		var dealBubble = new Sprite();
-		var masterDealList:Array = [[["L","J"], 4], 
-									[["S","Z"], 3],
+		var masterDealList:Array = [[["L","J"], 3], 
+									[["S","Z"], 2],
+									[["T","u"], 2],
 									[["t","r"], 1],
 									[["l","Y"], 4],
-									[["5","H"], 6],
+									[["l","O"], 6],
+									[["5","H"], 7],
+									[["U","T"], 2],
 									[["T","O"], 4],
-									[["U","5"], 7]
+									[["t","5"], 4]
 									];
 		var masterSaleList:Array = [[["r"], 1],
 									[["T"], 2],
@@ -31,6 +34,7 @@
 									[["J"], 2],
 									[["l"], 1],
 									[["O"], 2],
+									[["u"], 3],
 									[["U"], 4],
 									[["H"], 5],
 									[["t"], 6],
@@ -59,11 +63,11 @@
 			else trace (piece +" cannot be removed");
 		}
 		public function clearText(){
-			for (var i in textList) {
+			for (var i = 0; i < textList.length; i++) {
 				stage.removeChild(textList[i]);
 				delete(textList[i]);
 			}
-			trace(textList);
+			trace("textList after clearText(): " + textList);
 			textList = [];
 		}
 		public function drawDealBubble(s:Sprite, numDeals:int) {
@@ -81,7 +85,10 @@
 			for (var deal in masterDealList) {
 				if ((BlockMerchant.playset.indexOf(masterDealList[deal][0][0]) == -1) &&
 					(BlockMerchant.playset.indexOf(masterDealList[deal][0][1]) == -1))
-					deals.push([masterDealList[deal][0],[],masterDealList[deal][1]]);
+					deals.push([masterDealList[deal][0],[],masterDealList[deal][1], ""]);
+			}
+			if (Board.money > 10) {
+				deals.push([[],[],Deal.orbCost, "orb"]); //orb of time
 			}
 
 			//if ((BlockMerchant.playset.indexOf("L") == -1) &&
@@ -129,11 +136,9 @@
 					textList.push(costText);
 					stage.addChild(costText);
 					
-					trace(deals.length + " deals");
-					trace(deals);
 					for (var deal in deals) {
 						//new Deal(deals[deal][0], [], deals[deal][1], deal+1, this); // additions, removals, price, position, shop
-						new Deal(deals[deal][0], deals[deal][1], deals[deal][2], deal+1, this); // additions, removals, price, position, shop
+						new Deal(deals[deal][0], deals[deal][1], deals[deal][2], deals[deal][3], deal+1, this); // additions, removals, price, special, position, shop
 					}
 	
 					//new Deal(["T"], ["H", "Y", "t"], 5, 1, this);

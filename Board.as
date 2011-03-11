@@ -34,7 +34,7 @@
 				}
 			}
 			for (var i = 0;i<5;i++) cleared[i] = 0;
-			money = 10;
+			money = 2;
 			points = 0;
 			linesCleared = 0;
 			level = 1;
@@ -125,7 +125,8 @@
 		}
 		
 		public static function levelCurve() {
-			return ((level * level) + level)*5/2-4;
+			//return ((level * level) + level)*5/2;
+			return (level * 10) + Math.floor(level/5)*5 -5
 		}
 	}
 	

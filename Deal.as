@@ -9,22 +9,26 @@
 	public class Deal extends MovieClip{
 		var textList:Array = [];
 		static var list:Array = [];
+		static var orbCost:int = 20;
 		var shop:Shop;
 		var placement:int;
 		var additions:Array;
 		var removals:Array;
 		var price:int;
+		var special:String;
 		var saleText:TextField;
 		var costText:TextField;
+		var description:TextField;
 		var components:Array = [];
 		var pressTimer:int = 0;
 		
 		
-		public function Deal(_additions:Array, _removals:Array, _price:int, _placement:int, _shop:Shop) {
+		public function Deal(_additions:Array, _removals:Array, _price:int, _special:String, _placement:int, _shop:Shop) {
 			// constructor code
 			additions = _additions;
 			removals = _removals;
 			price = _price;
+			special = _special;
 			shop = _shop;
 			placement = _placement;
 			shop.parent.addChild(this); //shop.parent is stage
@@ -64,12 +68,29 @@
 				b.y = 75+placement*50;
 				components.push(b);
 			}
+			if ((additions.length == 0) && (removals.length == 0)) { // special purchase
+				if (special == "orb") { // orb of time
+					//description = new TextField();
+					//description.defaultTextFormat = Shop.salesFormat;
+					//description.x = 325;
+					//description.y = placement*50*87;
+					//description.text = String("Orb of Time");
+					//shop.textList.push(description);
+					//stage.addChild(description);
+					
+					var o = new Orb();
+					stage.addChild(o);
+					o.x = 355;
+					o.y = 75+placement*50;
+					components.push(o);
+				}
+			}
+				
 			addEventListener("enterFrame", enterFrame);
 		}
 		
 		function destroy() {
-			for (var i in components){
-				trace("destroying " +components[i]);
+			for (var i = 0; i < components.length; i++){
 				components[i].destroy();
 				delete components[i];
 			}
@@ -85,7 +106,7 @@
 				trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
 				if(Board.money < price) {
 					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
-					shop.greeting.appendText("Choose again or go on to the n)ext level.");
+					shop.greeting.appendText("\nChoose again or go on to the n)ext level.");
 				}
 				else {
 					Board.money -= price;
@@ -97,6 +118,12 @@
 					}
 					destroy();
 					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
+					if (special == "orb") { 
+						shop.greeting.text = "Oink!  Oink!  An orb of time!";
+						orbCost *= 2;
+						if (Block.gravity >3) Block.gravity -= 3;
+						else Block.gravity = 1;
+					}
 					shop.greeting.appendText("\nPress n for n)ext level when you're done.");
 					saleText.visible= false;
 					costText.visible= false;

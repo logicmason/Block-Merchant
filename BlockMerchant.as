@@ -8,8 +8,9 @@
 	import flash.text.TextFormat;
 	
 	public class BlockMerchant extends MovieClip{
-		static var masterset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O", "r", "t", "H"];
-		static var playset:Array = ["T", "Y", "S", "Z", "5", "U", "L", "J", "l", "O", "r", "t", "H"];
+		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
+		static var startingSet:Array = ["S", "Z", "u", "T", "L", "J"];
+		static var playset:Array = new Array;
 		static var current:Block;
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
@@ -17,9 +18,13 @@
 		static var shop:MovieClip;
 		static var pigPic:MovieClip;
 		static var gameOverMessage:TextField;
-		static var gameOverMessageFormat = new TextFormat();
+		static var greetingMessage:TextField;
+		static var messageFormat = new TextFormat();
 		
 		static var music1 = new ComfortMusic();
+		//static var music2 = new LostCauseMusic();
+		//static var music3 = new TruthMusic();
+		//static var music3 = new TheNetherMusic();
 		static var musicShopA = new ShoppeA();
 		static var musicShopB = new ShoppeB();
 		static var musicChannel;
@@ -29,23 +34,38 @@
 			shop = new Shop();
 			shop.x = 0;
 			shop.y = 530-shop.height;
+			shop.visible = false;
 			stage.addChild(shop);
 			pigPic = new PigPic();
 			pigPic.x = 20;
 			pigPic.y = 55;
+			pigPic.visible = false;
 			stage.addChild(pigPic);
+			
+			messageFormat.size = 14;
+			messageFormat.align = "center";
 			gameOverMessage = new TextField();
 			gameOverMessage.x = 70;
 			gameOverMessage.y = 75;
 			gameOverMessage.width = 160;
-			gameOverMessageFormat.size = 14;
-			gameOverMessage.defaultTextFormat = gameOverMessageFormat;
+			gameOverMessage.defaultTextFormat = messageFormat;
 			gameOverMessage.text = "Press ENTER to play again!";
+			gameOverMessage.visible = false;
 			addChild(gameOverMessage);
+			
+			greetingMessage = new TextField();
+			greetingMessage.x = 25;
+			greetingMessage.y = 125;
+			greetingMessage.width = 200;
+			greetingMessage.defaultTextFormat = messageFormat;
+			greetingMessage.text = "You start the game with " + Board.money +" gold.";
+			greetingMessage.appendText("\nClear multiple lines to get more.");
+			greetingMessage.appendText("\nPress ENTER to begin.");
+			addChild(greetingMessage);
 			
 			Key.initialize(stage);
 			board.traceBoard();
-			startGame();
+			//startGame();
 			addEventListener("enterFrame", enterFrame);
 		}
 		static function loopMusic(music) {
@@ -75,7 +95,9 @@
 			shop.visible = false;
 			pigPic.visible = false;
 			gameOverMessage.visible = false;
-			randomizePlayset();
+			greetingMessage.visible = false;
+			//randomizePlayset();
+			playset = startingSet.slice(0);
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
 			stage.addChild(current);
@@ -148,15 +170,25 @@
 			shop.dealsDisplayed = false;
 			shop.clearText();
 			stage.removeChild(shop.dealBubble);
+			trace(shop.textList.length);
+					for (var item in shop.textList) {
+						trace(item+": "+shop.textList[item].toString);
+					}
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
 			loopMusic(music1);
 		}
 		function enterFrame(e:Event){
-			if((Key.isDown(Keyboard.ENTER)) && (gameOverMessage.visible == true)) {
-				board.clean();
-				nextBlockImage = null;
-				startGame();
+			if((Key.isDown(Keyboard.ENTER))) {
+				if (gameOverMessage.visible == true) {
+					board.clean();
+					nextBlockImage = null;
+					startGame();
+				}
+				if (greetingMessage.visible == true) {
+					greetingMessage.visible = false;
+					startGame();
+				}
 				
 			}
 			if((Key.isDown(84))) { //t
@@ -170,6 +202,7 @@
 			levelDisplay.text = Board.level.toString();
 			linesDisplay.text = Board.linesCleared.toString();
 			linesRemainingDisplay.text = Board.linesRemaining.toString();
+			speedDisplay.text = Block.gravity.toString();
 			displayNextBlock();
 		}
 

@@ -87,6 +87,12 @@
 					shape = [[1,1], [1,2], [2,1], [2,2]];
 					make_shape(edge_color, inner_color, shape);
 					break;
+				case "u":
+					edge_color = 0xffaa00
+					inner_color = 0xcc7700;
+					shape = [[1,2], [3,2], [1,3], [2,3], [3,3]];
+					make_shape(edge_color, inner_color, shape);
+					break;
 				case "U":
 					edge_color = 0x339999;
 					inner_color = 0x006666;
