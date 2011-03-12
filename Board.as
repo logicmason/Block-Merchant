@@ -45,6 +45,7 @@
 			for (var row in slots) {
 				if (checkRow(row) == true) {
 					clearRow(row);
+					new LineClearSound().play();
 					rowsCleared += 1;
 				}
 			}

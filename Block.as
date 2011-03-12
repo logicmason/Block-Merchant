@@ -3,6 +3,7 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.ui.Keyboard;
+	import flash.media.SoundTransform;
 	
 	public class Block extends Sprite {
 		static const size:int = Board.gridSize;
@@ -21,7 +22,8 @@
 		var gravityCounter:Number = 0;
 		var dropSpeed:Number = 60;
 		var moveSpeed:Number = 15;
-		var moveLimiter:Number = 0;
+		var moveLimiter:int = 0;
+		var bumpLimiter:int = 0;
 		var lastx:int; //x magnitude of previous movement
 		var xspd:int = 5;
 		
@@ -240,6 +242,8 @@
 				if (BlockMerchant.current) trace ("Current block is " + BlockMerchant.current.id);
 				else trace("There is no current block!!!111! 8:o");
 			}
+			//timers
+			bumpLimiter += 1;
 			//keyboard input
 			if((Key.isDown(Keyboard.DOWN) || Key.isDown(83))){
 				gravityCounter += dropSpeed;
@@ -270,7 +274,11 @@
 			}
 			if(moveLimiter > 40 && (Key.isDown(Keyboard.UP) || Key.isDown(87))) {
 				if(gridhit(rotate(),0,0)) {
-					trace("OMG!  Rotational grid hit!!!111!!");
+					if (bumpLimiter > 10) {
+						bumpLimiter = 0;
+						trace("OMG!  Rotational grid hit!!!111!!");
+						new BumpSound().play();
+					}
 					//don't rotate the piece!
 				} else {
 					shape = rotate();
@@ -351,7 +359,6 @@
 					delete specialList[i];
 				}
 			}
-			//if (this.parent && this.parent == stage) stage.removeChild(this);
 			if (this.parent) this.parent.removeChild(this);
 		}
 		
@@ -397,6 +404,7 @@
 			BlockMerchant.current = null;
 			newBlock(); // can NOT be called after this.destroy (won't be a reference to the stage)
 			this.destroy(); //destroys original block
+			new ThudSound().play(); //play(0,0,new SoundTransform(.5));
 			Board.checkRows();
 		}
 	}

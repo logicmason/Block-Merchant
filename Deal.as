@@ -117,6 +117,7 @@
 						shop.removePiece(p);
 					}
 					destroy();
+					new KachingSound().play();
 					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
 					if (special == "orb") { 
 						shop.greeting.text = "Oink!  Oink!  An orb of time!";
