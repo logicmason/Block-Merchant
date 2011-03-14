@@ -7,7 +7,9 @@
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	
-	public class BlockMerchant extends MovieClip{
+	public dynamic class BlockMerchant extends MovieClip{
+		static var kongregate:*
+		
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
 		static var startingSet:Array = ["S", "Z", "u", "T", "L", "J"];
 		static var playset:Array = new Array;
@@ -17,8 +19,9 @@
 		static var board:Board;
 		static var shop:MovieClip;
 		static var pigPic:MovieClip;
-		static var introScreen:Intro;
+		static var introScreen:Intro = new Intro();
 		static var instructionScreen:IntroB = new IntroB();
+		static var creditsScreen:Credits = new Credits();
 		static var gameOverMessage:TextField;
 		static var messageFormat = new TextFormat();
 		
@@ -31,6 +34,7 @@
 		static var musicChannel;
 	
 		public function BlockMerchant() {
+			introScreen.version.text = "1.0"
 			board = new Board();
 			shop = new Shop();
 			shop.x = 0;
@@ -42,9 +46,11 @@
 			pigPic.y = 55;
 			pigPic.visible = false;
 			stage.addChild(pigPic);
-			introScreen = new Intro();
 			introScreen.startButton.addEventListener("mouseDown", startButtonHit);
 			stage.addChild(introScreen);
+			introScreen.creditsButton.addEventListener("mouseDown", creditsButtonHit);
+			creditsScreen.visible = false;
+			stage.addChild(creditsScreen);
 			
 			messageFormat.size = 14;
 			messageFormat.align = "center";
@@ -61,6 +67,14 @@
 			board.traceBoard();
 			//startGame();
 			addEventListener("enterFrame", enterFrame);
+		}
+		function creditsButtonHit(e:Event) {
+			creditsScreen.closeButton.addEventListener("mouseDown", closeCreditsHit);
+			creditsScreen.visible = true;
+		}
+		function closeCreditsHit(e:Event) {
+			creditsScreen.visible = false;
+			creditsScreen.removeEventListener("mouseDown", closeCreditsHit);
 		}
 		function startButtonHit(e:Event) {
 			introScreen.startButton.removeEventListener("mouseDown", startButtonHit);
