@@ -33,7 +33,7 @@
 					slots[y][x] = 0;
 				}
 			}
-			for (var i = 0;i<5;i++) cleared[i] = 0;
+			for (var i = 0;i<=5;i++) cleared[i] = 0;
 			money = 2;
 			points = 0;
 			linesCleared = 0;
@@ -113,6 +113,7 @@
 			trace(cleared[2] + " doubles cleared");
 			trace(cleared[3] + " triples cleared");
 			trace(cleared[4] + " quads cleared");
+			trace(cleared[5] + " fivers cleared");
 			trace("points: " + points+"  money: "+money);
 		}
 		

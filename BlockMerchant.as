@@ -1,15 +1,18 @@
 ﻿package  {
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.display.Loader;
+	import flash.display.LoaderInfo;
 	import flash.events.Event;
 	import flash.ui.Keyboard;
 	import flash.events.KeyboardEvent;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+	import flash.net.*;
 	
 	public dynamic class BlockMerchant extends MovieClip{
 		static var kongregate:*
-		
+				
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
 		static var startingSet:Array = ["S", "Z", "u", "T", "L", "J"];
 		static var playset:Array = new Array;
@@ -24,6 +27,8 @@
 		static var creditsScreen:Credits = new Credits();
 		static var gameOverMessage:TextField;
 		static var messageFormat = new TextFormat();
+		static var gameComplete = 0;
+		static var gameInitialized:Boolean;
 		
 		static var music1 = new ComfortMusic();
 		//static var music2 = new LostCauseMusic();
@@ -33,7 +38,36 @@
 		static var musicShopB = new ShoppeB();
 		static var musicChannel;
 	
+		public function loadAPI(){
+		  var paramObj:Object = LoaderInfo(root.loaderInfo).parameters;
+		  var api_url:String = paramObj.api_path ||  "http://www.kongregate.com/flash/API_AS3_Local.swf";
+		  var request:URLRequest = new URLRequest ( api_url );
+		  var loader:Loader = new Loader();
+		  loader.contentLoaderInfo.addEventListener ( Event.COMPLETE, apiLoadComplete );
+		  loader.load ( request );
+		  this.addChild ( loader );
+		}
+		public function apiLoadComplete( event:Event ):void {
+			kongregate = event.target.content;
+			kongregate.services.connect();
+			
+			kongregate.stats.submit("score", Board.points);
+			kongregate.stats.submit("gold", Board.money);
+			kongregate.stats.submit("gameComplete", gameComplete);
+			initializeGame();
+		}
+				
+		public function onConnectError(status:String):void {
+		// handle error here...
+			if(!gameInitialized) {initializeGame();}
+		}
 		public function BlockMerchant() {
+			//var _mochiads_game_id:String = "dcbe9b807ff7322e";
+			//mochi.as3.MochiServices.connect("dcbe9b807ff7322e", root, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
+			//MochiAd.showPreGameAd({clip:root, id:"dcbe9b807ff7322e", res:"600x300", ad_finished: initializeGame});
+			loadAPI();  // for Kongregate
+		}
+		public function initializeGame() {
 			introScreen.version.text = "1.0"
 			board = new Board();
 			shop = new Shop();
@@ -99,6 +133,7 @@
 			board.traceBoard();
 			trace(Block.list.length + "total blocks");
 			musicChannel.stop();
+			submitStats();
 		}
 		
 		function randomizePlayset() {
@@ -179,6 +214,7 @@
 			if(!musicChannel.hasEventListener(Event.SOUND_COMPLETE)) {
 				musicChannel.addEventListener( Event.SOUND_COMPLETE, musicComplete );
 			}
+			submitStats();
 			
 		}
 		static function musicComplete (e : Event) : void {
@@ -197,6 +233,24 @@
 			current.addEventListener("enterFrame", current.move);
 			loopMusic(music1);
 		}
+		
+		static function submitStats() {
+			kongregate.stats.submit("score", Board.points);
+			kongregate.stats.submit("gold", Board.money);
+			kongregate.stats.submit("linesCleared", Board.linesCleared);
+			
+			kongregate.stats.submit("singlesCleared", Board.cleared[1]);
+			kongregate.stats.submit("doublesCleared", Board.cleared[2]);
+			kongregate.stats.submit("triplesCleared", Board.cleared[3]);
+			kongregate.stats.submit("quadsCleared", Board.cleared[4]);
+			kongregate.stats.submit("fiversCleared", Board.cleared[5]);
+			
+			kongregate.stats.submit("level", Board.level);
+			kongregate.stats.submit("speed", Block.gravity);
+			//kongregate.stats.submit("playset", playset.toString()); // sends NAN for some reason
+			kongregate.stats.submit("gameComplete", gameComplete);
+		}
+		
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
 				if (gameOverMessage.visible == true) {
