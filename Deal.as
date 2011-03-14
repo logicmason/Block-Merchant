@@ -102,22 +102,31 @@
 			
 			if (pressTimer > 0) pressTimer -= 1;
 			if((saleText.visible == true) && (Key.isDown(48+placement)) && pressTimer == 0) { //the number key for this deal
-				pressTimer = 60;
+				pressTimer = 30;
 				trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
 				if(Board.money < price) {
 					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
 					shop.greeting.appendText("\nChoose again or go on to the n)ext level.");
 				}
 				else {
-					Board.money -= price;
+					if (BlockMerchant.playset.length + additions.length > 10) {
+						shop.greeting.text = "Oink! Oink!  You have too many pieces!";
+						shop.greeting.appendText("\nGo on to the n)ext level.");
+						return;
+					}
 					for each (var p in additions) {
 						shop.addPiece(p);
+					}
+					if (BlockMerchant.playset.length - removals.length < 5) {
+						shop.greeting.text = "Oink! Oink!  You need more many pieces!";
+						shop.greeting.appendText("\nGo on to the n)ext level.");
+						return;
 					}
 					for each (p in removals) {
 						shop.removePiece(p);
 					}
 					destroy();
-					new KachingSound().play();
+					
 					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
 					if (special == "orb") { 
 						shop.greeting.text = "Oink!  Oink!  An orb of time!";
@@ -125,6 +134,8 @@
 						if (Block.gravity >3) Block.gravity -= 3;
 						else Block.gravity = 1;
 					}
+					Board.money -= price;
+					new KachingSound().play();
 					shop.greeting.appendText("\nPress n for n)ext level when you're done.");
 					saleText.visible= false;
 					costText.visible= false;

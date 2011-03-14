@@ -45,7 +45,6 @@
 			for (var row in slots) {
 				if (checkRow(row) == true) {
 					clearRow(row);
-					new LineClearSound().play();
 					rowsCleared += 1;
 				}
 			}
@@ -118,6 +117,7 @@
 		}
 		
 		public static function rewardCleared(rowsCleared:int) {
+			new LineClearSound().play();
 			linesCleared += rowsCleared; //global counter for lines cleared
 			linesRemaining -= rowsCleared;
 			points += rowsCleared * rowsCleared * 100;

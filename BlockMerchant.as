@@ -17,8 +17,9 @@
 		static var board:Board;
 		static var shop:MovieClip;
 		static var pigPic:MovieClip;
+		static var introScreen:Intro;
+		static var instructionScreen:IntroB = new IntroB();
 		static var gameOverMessage:TextField;
-		static var greetingMessage:TextField;
 		static var messageFormat = new TextFormat();
 		
 		static var music1 = new ComfortMusic();
@@ -41,6 +42,9 @@
 			pigPic.y = 55;
 			pigPic.visible = false;
 			stage.addChild(pigPic);
+			introScreen = new Intro();
+			introScreen.startButton.addEventListener("mouseDown", startButtonHit);
+			stage.addChild(introScreen);
 			
 			messageFormat.size = 14;
 			messageFormat.align = "center";
@@ -53,21 +57,23 @@
 			gameOverMessage.visible = false;
 			addChild(gameOverMessage);
 			
-			greetingMessage = new TextField();
-			greetingMessage.x = 25;
-			greetingMessage.y = 125;
-			greetingMessage.width = 200;
-			greetingMessage.defaultTextFormat = messageFormat;
-			greetingMessage.text = "You start the game with " + Board.money +" gold.";
-			greetingMessage.appendText("\nClear multiple lines to get more.");
-			greetingMessage.appendText("\nPress ENTER to begin.");
-			addChild(greetingMessage);
-			
 			Key.initialize(stage);
 			board.traceBoard();
 			//startGame();
 			addEventListener("enterFrame", enterFrame);
 		}
+		function startButtonHit(e:Event) {
+			introScreen.startButton.removeEventListener("mouseDown", startButtonHit);
+			stage.removeChild(introScreen);
+			instructionScreen.playButton.addEventListener("mouseDown", playButtonHit);
+			stage.addChild(instructionScreen);
+		}
+		function playButtonHit(e:Event) {
+			instructionScreen.removeEventListener("mouseDown", playButtonHit);
+			stage.removeChild(instructionScreen);
+			startGame();
+		}
+		
 		static function loopMusic(music) {
 			if (musicChannel) { musicChannel.stop();}
 			musicChannel = music.play(0,1000);
@@ -95,7 +101,6 @@
 			shop.visible = false;
 			pigPic.visible = false;
 			gameOverMessage.visible = false;
-			greetingMessage.visible = false;
 			//randomizePlayset();
 			playset = startingSet.slice(0);
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
@@ -185,11 +190,7 @@
 					nextBlockImage = null;
 					startGame();
 				}
-				if (greetingMessage.visible == true) {
-					greetingMessage.visible = false;
-					startGame();
-				}
-				
+								
 			}
 			if((Key.isDown(84))) { //t
 				board.traceBoard();
