@@ -2,6 +2,7 @@
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	import flash.media.SoundTransform;
 	
@@ -26,7 +27,9 @@
 		var bumpLimiter:int = 0;
 		var lastx:int; //x magnitude of previous movement
 		var xspd:int = 5;
-		
+		var upPressed:Boolean;
+		var keyListenersSet:Boolean;
+				
 		public function Block(... rest) { // rest[0] is block type
 			// constructor code
 			type = rest[0];
@@ -126,7 +129,6 @@
 					make_shape(edge_color, inner_color, shape);
 					break;
 			}//switch
-			//addEventListener("enterFrame", move);
 			list.push(this);
 		} // constructor
 		
@@ -235,6 +237,37 @@
 			}
 			return newshape;
 		}
+		function setKeyListener(stage) {
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressed);
+			stage.addEventListener(KeyboardEvent.KEY_UP, keyReleased);
+			keyListenersSet = true;
+		}
+		function removeKeyListeners() {
+			if (keyListenersSet) {
+				parent.removeEventListener(KeyboardEvent.KEY_DOWN, keyPressed);
+				parent.removeEventListener(KeyboardEvent.KEY_UP, keyReleased);
+			}
+		}
+		function keyPressed(keyEvent:KeyboardEvent) {
+			if ((keyEvent.keyCode == 38) && upPressed == false) {  //up arrow is pressed and wasn't already down
+				upPressed = true;
+				if(gridhit(rotate(),0,0)) {
+					if (bumpLimiter > 10) {
+						bumpLimiter = 0;
+						trace("OMG!  Rotational grid hit!!!111!!");
+						new BumpSound().play();
+					}
+					//don't rotate the piece!
+				} else {
+					shape = rotate();
+					make_shape(edge_color, inner_color, shape);
+					moveLimiter = 0;
+				}
+			}
+		}
+		function keyReleased(keyEvent:KeyboardEvent) {
+			if (keyEvent.keyCode == 38) upPressed = false;
+		}
 		
 		function move(e:Event){
 			if (this != BlockMerchant.current) {
@@ -273,18 +306,18 @@
 				}
 			}
 			if(moveLimiter > 40 && (Key.isDown(Keyboard.UP) || Key.isDown(87))) {
-				if(gridhit(rotate(),0,0)) {
-					if (bumpLimiter > 10) {
-						bumpLimiter = 0;
-						trace("OMG!  Rotational grid hit!!!111!!");
-						new BumpSound().play();
-					}
+			//	if(gridhit(rotate(),0,0)) {
+			//		if (bumpLimiter > 10) {
+			//			bumpLimiter = 0;
+			//			trace("OMG!  Rotational grid hit!!!111!!");
+			//			new BumpSound().play();
+			//		}
 					//don't rotate the piece!
-				} else {
-					shape = rotate();
-					make_shape(edge_color, inner_color, shape);
-					moveLimiter = 0;
-				}
+				//} else {
+					//shape = rotate();
+					//make_shape(edge_color, inner_color, shape);
+					//moveLimiter = 0;
+				//}
 			}
 						
 			
@@ -324,6 +357,7 @@
 				
 				BlockMerchant.nextBlock = p[Math.floor(Math.random()*p.length)];
 				stage.addChild(b);
+				b.setKeyListener(stage);
 				b.gx = 5;
 				b.gy = 0;
 				BlockMerchant.current = b;
@@ -359,6 +393,7 @@
 					delete specialList[i];
 				}
 			}
+			removeKeyListeners();
 			if (this.parent) this.parent.removeChild(this);
 		}
 		

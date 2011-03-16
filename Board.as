@@ -128,7 +128,7 @@
 		
 		public static function levelCurve() {
 			//return ((level * level) + level)*5/2;
-			return (level * 10) + Math.floor(level/5)*5 -5
+			return (level * 10) + Math.floor(level/5)*5 -9;
 		}
 	}
 	

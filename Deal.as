@@ -94,24 +94,31 @@
 				components[i].destroy();
 				delete components[i];
 			}
+			for (i = 0; i < shop.dealList.length; i++) {
+				if (this == shop.dealList[i]) {
+					delete shop.dealList[i];
+					//shop.dealList.splice(i,1);
+				}
+			}
 			removeEventListener("enterFrame", enterFrame);
 			if (this.parent && this.parent == stage) stage.removeChild(this);
 		}
 		function enterFrame(e:Event) {
 			if(shop.visible == false) destroy();
-			
 			if (pressTimer > 0) pressTimer -= 1;
-			if((saleText.visible == true) && (Key.isDown(48+placement)) && pressTimer == 0) { //the number key for this deal
+			
+			if((saleText.visible == true) && pressTimer == 0 && 
+			   ((Key.isDown(48+placement)) || (Key.isDown(96+placement)))) { //the number key for this deal
 				pressTimer = 30;
 				trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
 				if(Board.money < price) {
 					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
-					shop.greeting.appendText("\nChoose again or go on to the n)ext level.");
+					shop.greeting.appendText("\nChoose again, r)eturn or go to the n)ext level.");
 				}
 				else {
 					if (BlockMerchant.playset.length + additions.length > 10) {
 						shop.greeting.text = "Oink! Oink!  You have too many pieces!";
-						shop.greeting.appendText("\nGo on to the n)ext level.");
+						shop.greeting.appendText("\nR)eturn to the menu or go to the n)ext level.");
 						return;
 					}
 					for each (var p in additions) {
@@ -119,7 +126,7 @@
 					}
 					if (BlockMerchant.playset.length - removals.length < 5) {
 						shop.greeting.text = "Oink! Oink!  You need more many pieces!";
-						shop.greeting.appendText("\nGo on to the n)ext level.");
+						shop.greeting.appendText("\nGR)eturn to the menu or go to the n)ext level.");
 						return;
 					}
 					for each (p in removals) {
@@ -136,7 +143,7 @@
 					}
 					Board.money -= price;
 					new KachingSound().play();
-					shop.greeting.appendText("\nPress n for n)ext level when you're done.");
+					shop.greeting.appendText("\nContinue shopping, r)eturn or go to the n)ext level.");
 					saleText.visible= false;
 					costText.visible= false;
 					return;

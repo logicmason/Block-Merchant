@@ -30,8 +30,7 @@ package
         }
         
 		
-        public static function isDown(keyCode:uint):Boolean 
-		{
+        public static function isDown(keyCode:uint):Boolean {
             return Boolean(keyCode in keysDown);
         }
         

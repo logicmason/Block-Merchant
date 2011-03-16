@@ -62,13 +62,13 @@
 			if(!gameInitialized) {initializeGame();}
 		}
 		public function BlockMerchant() {
-			//var _mochiads_game_id:String = "dcbe9b807ff7322e";
+			var _mochiads_game_id:String = "701defcb37bf8dbc";
 			//mochi.as3.MochiServices.connect("dcbe9b807ff7322e", root, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
 			//MochiAd.showPreGameAd({clip:root, id:"dcbe9b807ff7322e", res:"600x300", ad_finished: initializeGame});
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.0"
+			introScreen.version.text = "1.02"
 			board = new Board();
 			shop = new Shop();
 			shop.x = 0;
@@ -155,6 +155,7 @@
 			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
 			current.addEventListener("enterFrame", current.move);
 			stage.addChild(current);
+			current.setKeyListener(stage);
 			current.gx = 4;
 			current.gy = 0;
 			displayPlayset();
