@@ -92,9 +92,10 @@
 				deals.push([[],[],Deal.orbCost, "orb"]); //orb of time
 			}
 
-			//if ((BlockMerchant.playset.indexOf("L") == -1) &&
-				//(BlockMerchant.playset.indexOf("J") == -1))
-				//deals.push([["L", "J"], 5]);
+			if(deals.length < 1) {
+				greeting.text = "Oink! Oink!  I don't have any sets to offer you!";
+				greeting.appendText("\nPress n for n)ext level or s to s)ell.");
+			}
 				trace("Current deals: " + deals);
 		}
 		public function prepareSales() {
@@ -113,8 +114,8 @@
 			if(Key.isDown(82)) { //r
 				if(dealBubble.parent) {
 					dealBubble.parent.removeChild(dealBubble);
-					for each (var d in dealList) {
-						d.destroy();
+					for (var d = 0; d < dealList.length; d++) {
+						if (dealList[d]) dealList[d].destroy();
 					}
 					deals = [];
 					dealList = [];

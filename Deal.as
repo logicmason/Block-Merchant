@@ -94,14 +94,13 @@
 				components[i].destroy();
 				delete components[i];
 			}
+			removeEventListener("enterFrame", enterFrame);
+			//if (this.parent && this.parent == stage) stage.removeChild(this);
 			for (i = 0; i < shop.dealList.length; i++) {
 				if (this == shop.dealList[i]) {
 					delete shop.dealList[i];
-					//shop.dealList.splice(i,1);
 				}
 			}
-			removeEventListener("enterFrame", enterFrame);
-			if (this.parent && this.parent == stage) stage.removeChild(this);
 		}
 		function enterFrame(e:Event) {
 			if(shop.visible == false) destroy();
