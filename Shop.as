@@ -15,6 +15,7 @@
 		var textList:Array = [];
 		var textFormatList:Array = [];
 		static var salesFormat = new TextFormat();
+		static var inventoryFormat = new TextFormat();
 		var dealBubble = new Sprite();
 		var masterDealList:Array = [[["L","J"], 3], 
 									[["S","Z"], 2],
@@ -46,6 +47,9 @@
 			// constructor code
 			salesFormat.size = 15;
 			salesFormat.color = 0xFFFFFF;
+			inventoryFormat.size = 18;
+			inventoryFormat.color = 0xFFFFFF;
+			inventoryFormat.align = "center";
 			addEventListener("enterFrame", enterFrame);
 		}
 		
@@ -94,7 +98,6 @@
 
 			if(deals.length < 1) {
 				greeting.text = "Oink! Oink!  I don't have any sets to offer you!";
-				greeting.appendText("\nPress n for n)ext level or s to s)ell.");
 			}
 				trace("Current deals: " + deals);
 		}
@@ -109,38 +112,55 @@
 			}
 			trace("Current sales: " + deals);
 		}
-		function enterFrame(e:Event){
-			gold.text = Board.money.toString();
-			if(Key.isDown(82)) { //r
-				if(dealBubble.parent) {
-					dealBubble.parent.removeChild(dealBubble);
-					for (var d = 0; d < dealList.length; d++) {
-						if (dealList[d]) dealList[d].destroy();
-					}
-					deals = [];
-					dealList = [];
-					dealsDisplayed = false;
-					clearText();
-				}
+		function clearDeals() {
+			if(dealBubble.parent) {
+				dealBubble.parent.removeChild(dealBubble);
 			}
-			if((this.visible == true) && (dealsDisplayed == false)) {
-				deals = [];
-				dealList = [];
-				greeting.text = "Oink! Oink!  Welcome to my block shop!";
-				greeting.appendText("\nWould you like to b)uy or s)ell?");
-				//greeting.appendText("\nPress a number key to buy or sell.");
-				
-				if((Key.isDown(66))) { //b
-					greeting.text = "Press a number key to buy a pack of blocks.";
-					greeting.appendText("\nPress n for n)ext level or r to r)eturn.");
-					prepareDeals();
+			for (var d = 0; d < dealList.length; d++) {
+				if (dealList[d]) dealList[d].destroy();
+			}
+			deals = [];
+			dealList = [];
+			dealsDisplayed = false;
+			clearText();
+			BlockMerchant.clearPlayset();
+		}
+		function enterFrame(e:Event){
+			if (this.visible == true) {
+				gold.text = Board.money.toString();
+				if((dealsDisplayed == false)) {
+					greeting.text = "Oink! Oink!  Welcome to my block shop!";
 				}
-				if((Key.isDown(83))) { //s
-					greeting.text = "Press a number key to sell one of your blocks.";
-					greeting.appendText("\nPress n for n)ext level or r to r)eturn.");
+				// L leaves (function in BlockMerchant.as)
+				if(Key.isDown(82)) { //r
+					clearDeals();
+				}
+				if((Key.isDown(66))) { //b
+						clearDeals();
+						greeting.text = "Press a number key to buy a pack of blocks.";
+						prepareDeals();
+				}
+				if((Key.isDown(68))) { //d
+					clearDeals();
+					greeting.text = "Press a number key to destroy one of your blocks.";
 					prepareSales();
 				}
-				
+				if((Key.isDown(73))) { //i
+					//Board.money += 1;
+					trace("dealList.length: " + dealList.length);
+					clearDeals();
+					greeting.text = "Your current inventory: ";
+					drawDealBubble(dealBubble,7);  // not really a deal, but it makes the logic simpler
+					var inventoryText = new TextField();
+					inventoryText.defaultTextFormat = inventoryFormat;
+					inventoryText.y = 125;
+					inventoryText.x = 325;
+					inventoryText.text = "Your Blocks";
+					textList.push(inventoryText);
+					stage.addChild(inventoryText);
+					displayPlayset();
+					dealsDisplayed = true;
+				}
 				if (deals.length > 0) {
 					drawDealBubble(dealBubble,deals.length);
 					var costText = new TextField();
@@ -156,10 +176,23 @@
 						var nd =new Deal(deals[deal][0], deals[deal][1], deals[deal][2], deals[deal][3], deal+1, this); // additions, removals, price, special, position, shop
 						dealList.push(nd);
 					}
-	
+					deals = [];
 					//new Deal(["T"], ["H", "Y", "t"], 5, 1, this);
 					dealsDisplayed = true;
+					
 				}
+			}
+		}
+		function displayPlayset() {
+			BlockMerchant.clearPlayset();
+			for (var i in BlockMerchant.playset) {
+				var b = new Block(BlockMerchant.playset[i]);
+				b.makeSpecial();
+				stage.addChild(b);
+				b.height *= .7;
+				b.width *= .7;
+				b.x = 310+70*(i%2);
+				b.y = Math.floor(i/2)*70+150;
 			}
 		}
 

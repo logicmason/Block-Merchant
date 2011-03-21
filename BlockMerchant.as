@@ -68,7 +68,7 @@
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.02"
+			introScreen.version.text = "1.03"
 			board = new Board();
 			shop = new Shop();
 			shop.x = 0;
@@ -223,9 +223,8 @@
     	}
 		function nextLevel()  {  // may only be called from shop after deals have been displayed
 			shop.visible = false;
-			shop.dealsDisplayed = false;
+			shop.clearDeals();
 			shop.clearText();
-			stage.removeChild(shop.dealBubble);
 			trace(shop.textList.length);
 					for (var item in shop.textList) {
 						trace(item+": "+shop.textList[item].toString);
@@ -264,7 +263,7 @@
 			if((Key.isDown(84))) { //t
 				board.traceBoard();
 			}
-			if((shop.visible == true) && (shop.dealsDisplayed == true) && (Key.isDown(78))) { //n
+			if((shop.visible == true) && (Key.isDown(76))) { //L
 				nextLevel();
 			}
 			goldDisplay.text = Board.money.toString();

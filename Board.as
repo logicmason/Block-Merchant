@@ -38,6 +38,7 @@
 			points = 0;
 			linesCleared = 0;
 			level = 1;
+			Block.gravity = 1;
 			linesRemaining = levelCurve();
 		}
 		public static function checkRows() {
