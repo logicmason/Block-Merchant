@@ -73,6 +73,7 @@
 		public function initializeGame() {
 			introScreen.version.text = "1.04"
 			board = new Board();
+			Board.stageLink = stage;
 			shop = new Shop();
 			shop.x = 0;
 			shop.y = 530-shop.height;

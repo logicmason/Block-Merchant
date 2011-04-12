@@ -17,12 +17,12 @@
 		static var level:int;
 		static var money:int;
 		static var points:int;
+		static var stageLink;
 		
 
 		public function Board() {
 			// constructor code
-			initialize();
-			traceBoard();
+			initialize();			
 			//addEventListener("enterFrame", enterFrame);
 		}
 		
@@ -43,16 +43,18 @@
 		}
 		public static function checkRows() {
 			var rowsCleared:int = 0;
+			var bottomRowCleared:int;
 			for (var row in slots) {
 				if (checkRow(row) == true) {
 					clearRow(row);
 					rowsCleared += 1;
+					if (row > bottomRowCleared) bottomRowCleared = row;
 				}
 			}
 			if (rowsCleared > 0) {
 				trace(rowsCleared+ " rows cleared");
 				cleared[rowsCleared] += 1;
-				rewardCleared(rowsCleared);
+				rewardCleared(rowsCleared, bottomRowCleared);
 			}
 			return rowsCleared;
 		}
@@ -118,12 +120,21 @@
 			trace("points: " + points+"  money: "+money);
 		}
 		
-		public static function rewardCleared(rowsCleared:int) {
+		public static function rewardCleared(rowsCleared:int, bottomRow:int) {
 			new LineClearSound().play();
 			linesCleared += rowsCleared; //global counter for lines cleared
 			linesRemaining -= rowsCleared;
 			points += rowsCleared * rowsCleared * 100;
-			money += Math.pow(2, (rowsCleared-1)) - 1;
+			var moneyReward = Math.pow(2, (rowsCleared-1)) - 1;
+			money += moneyReward;
+			if (moneyReward > 0) {
+				var mrd = new TempText();
+				mrd.displayText.text = "";
+				for (var i=0; i<moneyReward; i++) mrd.displayText.text += "$";
+				mrd.x = width*gridSize/2;
+				mrd.y = top+gridSize*bottomRow;
+				stageLink.addChild(mrd);
+			}
 			if (linesCleared >= levelCurve()) BlockMerchant.endLevel();
 		}
 		
