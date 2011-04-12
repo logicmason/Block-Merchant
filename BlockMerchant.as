@@ -6,6 +6,7 @@
 	import flash.events.Event;
 	import flash.ui.Keyboard;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.net.*;
@@ -16,6 +17,7 @@
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
 		static var startingSet:Array = ["S", "Z", "u", "T", "L", "J"];
 		static var playset:Array = new Array;
+		static var isKeyPressed:Array = new Array;
 		static var current:Block;
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
@@ -29,6 +31,7 @@
 		static var messageFormat = new TextFormat();
 		static var gameComplete = 0;
 		static var gameInitialized:Boolean;
+		static var isPaused:Boolean;
 		
 		static var music1 = new ComfortMusic();
 		//static var music2 = new LostCauseMusic();
@@ -68,7 +71,7 @@
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.03"
+			introScreen.version.text = "1.04"
 			board = new Board();
 			shop = new Shop();
 			shop.x = 0;
@@ -76,8 +79,8 @@
 			shop.visible = false;
 			stage.addChild(shop);
 			pigPic = new PigPic();
-			pigPic.x = 20;
-			pigPic.y = 55;
+			pigPic.x = 10;
+			pigPic.y = 88;
 			pigPic.visible = false;
 			stage.addChild(pigPic);
 			introScreen.startButton.addEventListener("mouseDown", startButtonHit);
@@ -86,18 +89,22 @@
 			creditsScreen.visible = false;
 			stage.addChild(creditsScreen);
 			
-			messageFormat.size = 14;
+			messageFormat.size = 16;
 			messageFormat.align = "center";
 			gameOverMessage = new TextField();
-			gameOverMessage.x = 70;
-			gameOverMessage.y = 75;
-			gameOverMessage.width = 160;
+			gameOverMessage.x = 60;
+			gameOverMessage.y = 105;
+			gameOverMessage.width = 170;
 			gameOverMessage.defaultTextFormat = messageFormat;
 			gameOverMessage.text = "Press ENTER to play again!";
 			gameOverMessage.visible = false;
 			addChild(gameOverMessage);
+			gamePaused.visible = false;
 			
 			Key.initialize(stage);
+			setKeyListener(stage);
+			pauseButton.addEventListener(MouseEvent.CLICK, pauseClicked);
+
 			board.traceBoard();
 			//startGame();
 			addEventListener("enterFrame", enterFrame);
@@ -121,7 +128,9 @@
 			stage.removeChild(instructionScreen);
 			startGame();
 		}
-		
+		function pauseClicked(e:Event) {
+			pause();
+		}
 		static function loopMusic(music) {
 			if (musicChannel) { musicChannel.stop();}
 			musicChannel = music.play(0,1000);
@@ -129,6 +138,11 @@
 		static function gameOver() {
 			trace("Game Over, no extra life!");
 			pigPic.visible = true;
+			var p = gameOverMessage.parent;
+			var gp = p.parent;
+			trace ("P: "+p+" GP: "+gp);
+			gp.setChildIndex(p, gp.numChildren -1);
+			p.setChildIndex(gameOverMessage, p.numChildren -1);
 			gameOverMessage.visible = true;
 			board.traceBoard();
 			trace(Block.list.length + "total blocks");
@@ -232,8 +246,24 @@
 			displayPlayset();
 			current.addEventListener("enterFrame", current.move);
 			loopMusic(music1);
+			//pause();
 		}
-		
+		function pause() {
+			if (isPaused == true) {
+				if(shop.visible == false) {
+					current.addEventListener("enterFrame", current.move);
+					current.setKeyListener(stage);
+					isPaused = false;
+					gamePaused.visible = false;
+				}
+			} else if(shop.visible == false) {
+				current.removeEventListener("enterFrame", current.move);
+				current.removeKeyListeners();
+				isPaused = true;
+				
+				gamePaused.visible = true;
+			}
+		}
 		static function submitStats() {
 			kongregate.stats.submit("score", Board.points);
 			kongregate.stats.submit("gold", Board.money);
@@ -251,6 +281,28 @@
 			kongregate.stats.submit("gameComplete", gameComplete);
 		}
 		
+		function setKeyListener(stage) {
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressed);
+			stage.addEventListener(KeyboardEvent.KEY_UP, keyReleased);
+			//keyListenersSet = true;
+		}
+		function removeKeyListeners() {
+			//if (keyListenersSet) {
+				parent.removeEventListener(KeyboardEvent.KEY_DOWN, keyPressed);
+				parent.removeEventListener(KeyboardEvent.KEY_UP, keyReleased);
+			//}
+		}
+		function keyPressed(keyEvent:KeyboardEvent) {
+			if (isKeyPressed[keyEvent.keyCode] == false) {
+				if(keyEvent.keyCode == 80) { //p
+					pause();
+				}
+			}
+			isKeyPressed[keyEvent.keyCode] = true;
+		}
+		function keyReleased(keyEvent:KeyboardEvent) {
+			isKeyPressed[keyEvent.keyCode] = false;
+		}
 		function enterFrame(e:Event){
 			if((Key.isDown(Keyboard.ENTER))) {
 				if (gameOverMessage.visible == true) {
@@ -260,7 +312,8 @@
 				}
 								
 			}
-			if((Key.isDown(84))) { //t
+			
+			if(Key.isDown(84)) { //t
 				board.traceBoard();
 			}
 			if((shop.visible == true) && (Key.isDown(76))) { //L
