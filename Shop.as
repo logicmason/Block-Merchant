@@ -16,9 +16,12 @@
 		var textFormatList:Array = [];
 		static var salesFormat = new TextFormat();
 		static var inventoryFormat = new TextFormat();
+		var visits:int = 0; // incremented in BlockMerchant.as endLevel()
 		var dealBubble = new Sprite();
-		var masterDealList:Array = [[["L","J"], 3], 
-									[["S","Z"], 2],
+		var masterDealList:Array = [[["U","Y"], 0],
+									[["u","H"], 0],
+									[["L","J"], 4], 
+									[["S","Z"], 3],
 									[["T","u"], 2],
 									[["t","r"], 1],
 									[["l","Y"], 4],
@@ -72,7 +75,6 @@
 				stage.removeChild(textList[i]);
 				delete(textList[i]);
 			}
-			trace("textList after clearText(): " + textList);
 			textList = [];
 		}
 		public function drawDealBubble(s:Sprite, numDeals:int) {
@@ -81,7 +83,7 @@
 			s.graphics.clear();
 			s.graphics.lineStyle(3,edge_color);
 			s.graphics.beginFill(inner_color);
-			s.graphics.drawRect(300,110,155-3,40+50*(numDeals)-3);
+			s.graphics.drawRect(300,100,155-3,28+50*(numDeals)-3);
 			s.graphics.endFill();
 			stage.addChild(s);
 		}
@@ -95,11 +97,11 @@
 			if (Board.money > 10) {
 				deals.push([[],[],Deal.orbCost, "orb"]); //orb of time
 			}
-
+			if(deals.length > 8) deals = deals.slice(0,8);
 			if(deals.length < 1) {
 				greeting.text = "Oink! Oink!  I don't have any sets to offer you!";
 			}
-				trace("Current deals: " + deals);
+				//trace("Current deals: " + deals);
 		}
 		public function prepareSales() {
 			deals = [];
@@ -110,6 +112,7 @@
 				
 				
 			}
+			if (deals.length > 8) deals = deals.slice(0,8);
 			trace("Current sales: " + deals);
 		}
 		function clearDeals() {
@@ -129,7 +132,17 @@
 			if (this.visible == true) {
 				gold.text = Board.money.toString();
 				if((dealsDisplayed == false)) {
-					greeting.text = "Oink! Oink!  Welcome to my block shop!";
+					if (visits == 1) {
+						greeting.text = "Greetings piglet!  First you'll need to buy some blocks!";
+						greeting.appendText("\nI only sell them in sets of two.");
+					} else if (visits ==2) {
+						greeting.text = "Some of those blocks are hard to use, aren't they?";
+						greeting.appendText("\nJust this once I'll clean the board for you, oink!");
+						BlockMerchant.boardLink.clean();
+						
+					} else {
+						greeting.text = "Oink! Oink!  Welcome to my block shop!";
+					}
 				}
 				// L leaves (function in BlockMerchant.as)
 				if(Key.isDown(82)) { //r
@@ -150,7 +163,7 @@
 					trace("dealList.length: " + dealList.length);
 					clearDeals();
 					greeting.text = "Your current inventory: ";
-					drawDealBubble(dealBubble,7);  // not really a deal, but it makes the logic simpler
+					drawDealBubble(dealBubble,2+BlockMerchant.playset.length/1.5);  // not really a deal, but it makes the logic simpler
 					var inventoryText = new TextField();
 					inventoryText.defaultTextFormat = inventoryFormat;
 					inventoryText.y = 125;

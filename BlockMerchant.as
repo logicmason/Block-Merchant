@@ -10,15 +10,20 @@
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.net.*;
+	import mochi.as3.*
 	
 	public dynamic class BlockMerchant extends MovieClip{
 		static var kongregate:*
+		//for Mochi
+		static var o:Object = { n: [3, 1, 9, 8, 7, 1, 3, 2, 5, 5, 9, 5, 10, 7, 4, 6], f: function (i:Number,s:String):String { if (s.length == 16) return s; return this.f(i+1,s + this.n[i].toString(16));}};
+		static var boardID:String = o.f(0,"");
 				
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
-		static var startingSet:Array = ["S", "Z", "u", "T", "L", "J"];
+		static var startingSet:Array = [];//["S", "Z", "u", "T", "L", "J"];
+		static var minPlayset = 4;
 		static var playset:Array = new Array;
 		static var isKeyPressed:Array = new Array;
-		static var current:Block;
+		static var current:Block = null;
 		static var nextBlock:String; //the name of the type of the next block
 		static var nextBlockImage:Block = null; // the display of the next block
 		static var board:Board;
@@ -28,10 +33,14 @@
 		static var instructionScreen:IntroB = new IntroB();
 		static var creditsScreen:Credits = new Credits();
 		static var gameOverMessage:TextField;
+		static var gamePaused:TextField;
 		static var messageFormat = new TextFormat();
+		static var pausedFormat = new TextFormat();
 		static var gameComplete = 0;
 		static var gameInitialized:Boolean;
 		static var isPaused:Boolean;
+		static var boardLink;
+		static var bmLink;
 		
 		static var music1 = new ComfortMusic();
 		//static var music2 = new LostCauseMusic();
@@ -62,25 +71,29 @@
 				
 		public function onConnectError(status:String):void {
 		// handle error here...
+			trace("couldn't connect to Mochi API");
 			if(!gameInitialized) {initializeGame();}
 		}
 		public function BlockMerchant() {
+			bmLink = this;
+			
 			var _mochiads_game_id:String = "701defcb37bf8dbc";
-			//mochi.as3.MochiServices.connect("dcbe9b807ff7322e", root, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
+			mochi.as3.MochiServices.connect("701defcb37bf8dbc", bmLink, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
 			//MochiAd.showPreGameAd({clip:root, id:"dcbe9b807ff7322e", res:"600x300", ad_finished: initializeGame});
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.04"
+			introScreen.version.text = "1.11"
 			board = new Board();
 			Board.stageLink = stage;
+			boardLink = board;
 			shop = new Shop();
 			shop.x = 0;
 			shop.y = 530-shop.height;
 			shop.visible = false;
 			stage.addChild(shop);
 			pigPic = new PigPic();
-			pigPic.x = 10;
+			pigPic.x = 8;
 			pigPic.y = 88;
 			pigPic.visible = false;
 			stage.addChild(pigPic);
@@ -93,14 +106,25 @@
 			messageFormat.size = 16;
 			messageFormat.align = "center";
 			gameOverMessage = new TextField();
-			gameOverMessage.x = 60;
+			gameOverMessage.x = 58;
 			gameOverMessage.y = 105;
 			gameOverMessage.width = 170;
 			gameOverMessage.defaultTextFormat = messageFormat;
 			gameOverMessage.text = "Press ENTER to play again!";
 			gameOverMessage.visible = false;
-			addChild(gameOverMessage);
+			stage.addChild(gameOverMessage);
+			
+			pausedFormat.size = 20;
+			pausedFormat.align = "center";
+			pausedFormat.font = "Copperplate Gothic Bold";
+			gamePaused = new TextField();
+			gamePaused.x = 35;
+			gamePaused.y = 218.6;
+			gamePaused.width = 172.95;
+			gamePaused.defaultTextFormat = pausedFormat;
+			gamePaused.text = "Game Paused\npress \"p\"";
 			gamePaused.visible = false;
+			stage.addChild(gamePaused);
 			
 			Key.initialize(stage);
 			setKeyListener(stage);
@@ -137,20 +161,39 @@
 			musicChannel = music.play(0,1000);
 		}
 		static function gameOver() {
-			trace("Game Over, no extra life!");
+			nextBlockImage.parent.removeChild(nextBlockImage);
+			nextBlockImage.destroy();
 			pigPic.visible = true;
 			var p = gameOverMessage.parent;
-			var gp = p.parent;
-			trace ("P: "+p+" GP: "+gp);
-			gp.setChildIndex(p, gp.numChildren -1);
 			p.setChildIndex(gameOverMessage, p.numChildren -1);
 			gameOverMessage.visible = true;
-			board.traceBoard();
-			trace(Block.list.length + "total blocks");
+			//board.traceBoard();
+			//trace(Block.list.length + "total blocks");
 			musicChannel.stop();
+			
 			submitStats();
+			//p = bmLink.parent;
+			//p.setChildIndex(bmLink, p.numChildren-1); //move blockMerchant obj to top
+			MochiScores.showLeaderboard({boardID: boardID, score: Board.points, 									
+				onDisplay: function () { onLeaderboardDisplay()}, 
+				onClose: function () { onLeaderboardClose()} });
 		}
 		
+		static function onLeaderboardDisplay() {
+			Block.hideAll();
+			pigPic.visible = false;
+			gameOverMessage.visible = false;
+			trace("Leaderboard Displayed");
+		}
+		static function onLeaderboardClose() {
+			Block.showAll();
+			pigPic.visible = true;
+			gameOverMessage.visible = true;
+			trace("Leaderboard Closed");
+		}
+		static function onLeaderboardError() {
+			trace("Leaderboard Error");
+		}
 		function randomizePlayset() {
 			playset = [];
 			var master = masterset.concat();
@@ -162,31 +205,38 @@
 			}
 		}
 		function startGame() {
+			board.initialize();
 			shop.visible = false;
+			shop.visits = 0;
 			pigPic.visible = false;
 			gameOverMessage.visible = false;
 			//randomizePlayset();
 			playset = startingSet.slice(0);
-			current = new Block(playset[Math.floor(Math.random()*playset.length)]);
-			current.addEventListener("enterFrame", current.move);
-			stage.addChild(current);
-			current.setKeyListener(stage);
-			current.gx = 4;
-			current.gy = 0;
-			displayPlayset();
-			nextBlock = playset[Math.floor(Math.random()*playset.length)];
-			loopMusic(music1);
+			endLevel();
+			if (playset.length > 0) {
+				current = new Block(playset[Math.floor(Math.random()*playset.length)]);
+				current.addEventListener("enterFrame", current.move);
+				stage.addChild(current);
+				current.setKeyListener(stage);
+				current.gx = 4;
+				current.gy = 0;
+				displayPlayset();
+				nextBlock = playset[Math.floor(Math.random()*playset.length)];
+			}
+			
+			//loopMusic(music1);
 		}
 		
-		function displayNextBlock() {
+		static function displayNextBlock() {
 			if (nextBlock) {
 				//trace("nextBlock is... " + nextBlock);
 				if (nextBlockImage) {
+					if(nextBlockImage.parent) nextBlockImage.parent.removeChild(nextBlockImage);
 					nextBlockImage.destroy();
 				}
 				nextBlockImage = new Block(nextBlock);
 				nextBlockImage.makeSpecial();
-				addChild(nextBlockImage);
+				Board.stageLink.addChild(nextBlockImage);
 				nextBlockImage.height *= 1;
 				nextBlockImage.width *= 1;
 				nextBlockImage.x = 330;
@@ -220,9 +270,11 @@
 			Board.level += 1;
 			Block.gravity += 1;
 			Board.linesRemaining = Board.levelCurve()-Board.linesCleared;
-			current.removeEventListener("enterFrame", current.move);
+			if (current) current.removeEventListener("enterFrame", current.move);
 			clearPlayset();
+			trace("shop.parent: "+shop.parent);
 			shop.visible = true;
+			shop.visits += 1;
 			shop.parent.setChildIndex(shop, shop.parent.numChildren-1);
 			
 			if (musicChannel) { musicChannel.stop();}
@@ -244,8 +296,18 @@
 					for (var item in shop.textList) {
 						trace(item+": "+shop.textList[item].toString);
 					}
+			if (current) current.addEventListener("enterFrame", current.move);
+			else { 
+				
+				current = new Block(playset[Math.floor(Math.random()*playset.length)]);
+				current.addEventListener("enterFrame", current.move);
+				stage.addChild(current);
+				current.setKeyListener(stage);
+				current.gx = 4;
+				current.gy = 0;
+			}
+			nextBlock = playset[Math.floor(Math.random()*playset.length)];
 			displayPlayset();
-			current.addEventListener("enterFrame", current.move);
 			loopMusic(music1);
 			//pause();
 		}
@@ -261,7 +323,7 @@
 				current.removeEventListener("enterFrame", current.move);
 				current.removeKeyListeners();
 				isPaused = true;
-				
+				stage.setChildIndex(gamePaused, stage.numChildren-1);
 				gamePaused.visible = true;
 			}
 		}
@@ -308,7 +370,6 @@
 			if((Key.isDown(Keyboard.ENTER))) {
 				if (gameOverMessage.visible == true) {
 					board.clean();
-					nextBlockImage = null;
 					startGame();
 				}
 								
@@ -318,15 +379,20 @@
 				board.traceBoard();
 			}
 			if((shop.visible == true) && (Key.isDown(76))) { //L
-				nextLevel();
+				if (playset.length >= minPlayset) nextLevel();
+				else {
+					shop.greeting.text = "Oink! Oink!  You can't leave without at least 4 pieces!";
+				}
+			} 
+			if(shop.visible == false) {
+				goldDisplay.text = Board.money.toString();
+				scoreDisplay.text = Board.points.toString();
+				levelDisplay.text = Board.level.toString();
+				linesDisplay.text = Board.linesCleared.toString();
+				linesRemainingDisplay.text = Board.linesRemaining.toString();
+				speedDisplay.text = Block.gravity.toString();
+				//displayNextBlock();
 			}
-			goldDisplay.text = Board.money.toString();
-			scoreDisplay.text = Board.points.toString();
-			levelDisplay.text = Board.level.toString();
-			linesDisplay.text = Board.linesCleared.toString();
-			linesRemainingDisplay.text = Board.linesRemaining.toString();
-			speedDisplay.text = Block.gravity.toString();
-			displayNextBlock();
 		}
 
 	}

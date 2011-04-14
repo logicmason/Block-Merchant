@@ -132,6 +132,23 @@
 			list.push(this);
 		} // constructor
 		
+		static function hideAll() {
+			for(var i in list) {
+				list[i].visible = false;
+			}
+			for(i in specialList) {
+				specialList[i].visible = false;
+			}
+		}
+		
+		static function showAll() {
+			for(var i in list) {
+				list[i].visible = true;
+			}
+			for(i in specialList) {
+				specialList[i].visible = true;
+			}
+		}
 		function makeSpecial() {
 			for(var i in list){
 				if(list[i] == this){
@@ -362,13 +379,14 @@
 				b.gy = 0;
 				BlockMerchant.current = b;
 				b.addEventListener("enterFrame", b.move);
+				BlockMerchant.displayNextBlock();
 				
 				if(gridhit(b,0,0)) {
 					b.kill();
 				} 
 				} else {
 					trace("ERROR: already have a current block");
-					trace("Current Block trace: " + BlockMerchant.current);
+				trace("Current Block trace: " + BlockMerchant.current);
 			}
 		}
 		

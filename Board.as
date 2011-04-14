@@ -27,18 +27,13 @@
 		}
 		
 		public function initialize(){
-			for (var y=0; y<height; y++) {
-				slots[y] = new Array();
-				for (var x=0; x<width; x++) {
-					slots[y][x] = 0;
-				}
-			}
+			clean(); //clears blocks from the board
 			for (var i = 0;i<=5;i++) cleared[i] = 0;
-			money = 2;
+			money = 5;
 			points = 0;
 			linesCleared = 0;
-			level = 1;
-			Block.gravity = 1;
+			level = 0;
+			Block.gravity = 0;
 			linesRemaining = levelCurve();
 		}
 		public static function checkRows() {
@@ -78,7 +73,12 @@
 			for each (b in destroyList) {
 				b.destroy();
 			}
-			initialize();
+			for (var y=0; y<height; y++) {
+				slots[y] = new Array();
+				for (var x=0; x<width; x++) {
+					slots[y][x] = 0;
+				}
+			}
 		}
 		
 		public static function clearRow(row:int) {

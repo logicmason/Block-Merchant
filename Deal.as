@@ -109,7 +109,7 @@
 			if((saleText.visible == true) && pressTimer == 0 && 
 			   ((Key.isDown(48+placement)) || (Key.isDown(96+placement)))) { //the number key for this deal
 				pressTimer = 30;
-				trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
+				//trace("Doing deal: " + additions + "," + removals+ "," + price +"," + placement);
 				if(Board.money < price) {
 					shop.greeting.text = "Oink! Oink!  You don't have enough gold for that!";
 				}
@@ -121,8 +121,9 @@
 					for each (var p in additions) {
 						shop.addPiece(p);
 					}
-					if (BlockMerchant.playset.length - removals.length < 3) {
-						shop.greeting.text = "Oink! Oink!  You need more many pieces!";
+					if ((BlockMerchant.playset.length - removals.length <= BlockMerchant.minPlayset) 
+						 && removals.length > 0) {
+						shop.greeting.text = "Oink! Oink!  You need at least 4 pieces!";
 						return;
 					}
 					for each (p in removals) {
