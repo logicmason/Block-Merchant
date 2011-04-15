@@ -94,6 +94,12 @@
 					(BlockMerchant.playset.indexOf(masterDealList[deal][0][1]) == -1))
 					deals.push([masterDealList[deal][0],[],masterDealList[deal][1], ""]);
 			}
+			if (BlockMerchant.sight < 2) {
+				deals.push([[],[],Deal.spyglassCost, "spyglass"]);
+			}
+			if (BlockMerchant.sight == 2) {
+				deals.push([[],[],Deal.telescopeCost, "telescope"]);
+			}
 			if (Board.money > 10) {
 				deals.push([[],[],Deal.orbCost, "orb"]); //orb of time
 			}
@@ -139,7 +145,10 @@
 						greeting.text = "Some of those blocks are hard to use, aren't they?";
 						greeting.appendText("\nJust this once I'll clean the board for you, oink!");
 						BlockMerchant.boardLink.clean();
-						
+					} else if ((visits ==3)) {
+						greeting.text = "Oink, Oink!  I have a present for you!";
+						greeting.appendText("\nThese glasses will let you see the next block!");
+						BlockMerchant.sight = 1;
 					} else {
 						greeting.text = "Oink! Oink!  Welcome to my block shop!";
 					}

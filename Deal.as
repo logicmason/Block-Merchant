@@ -10,6 +10,8 @@
 		var textList:Array = [];
 		static var list:Array = [];
 		static var orbCost:int = 20;
+		static var spyglassCost:int = 3;
+		static var telescopeCost:int = 5;
 		var shop:Shop;
 		var placement:int;
 		var additions:Array;
@@ -84,8 +86,21 @@
 					o.y = 75+placement*50;
 					components.push(o);
 				}
+				if (special == "spyglass") { //spyglass gives sight range of 2
+					var s = new Orb();
+					stage.addChild(s);
+					s.x = 355;
+					s.y = 75+placement*50;
+					components.push(s);
+				}
+				if (special == "telescope") { //telescope gives sight range of 3
+					s = new Orb();
+					stage.addChild(s);
+					s.x = 355;
+					s.y = 75+placement*50;
+					components.push(s);
+				}
 			}
-				
 			addEventListener("enterFrame", enterFrame);
 		}
 		
@@ -121,7 +136,7 @@
 					for each (var p in additions) {
 						shop.addPiece(p);
 					}
-					if ((BlockMerchant.playset.length - removals.length <= BlockMerchant.minPlayset) 
+					if ((BlockMerchant.playset.length - removals.length < BlockMerchant.minPlayset) 
 						 && removals.length > 0) {
 						shop.greeting.text = "Oink! Oink!  You need at least 4 pieces!";
 						return;
@@ -137,6 +152,16 @@
 						orbCost *= 2;
 						if (Block.gravity >3) Block.gravity -= 3;
 						else Block.gravity = 1;
+					}
+					if (special == "spyglass") { 
+						shop.greeting.text = "Oink!  Oink!  A spyglass!";
+						shop.greeting.appendText("\nNow you can see the next two blocks!");
+						BlockMerchant.sight=2;
+					}
+					if (special == "telescope") { 
+						shop.greeting.text = "Oink!  Oink!  A telescope!";
+						shop.greeting.appendText("\nNow you can see the next three blocks!");
+						BlockMerchant.sight=3;
 					}
 					Board.money -= price;
 					new KachingSound().play();

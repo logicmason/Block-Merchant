@@ -138,9 +138,13 @@
 			if (linesCleared >= levelCurve()) BlockMerchant.endLevel();
 		}
 		
-		public static function levelCurve() {
-			//return ((level * level) + level)*5/2;
-			return (level * 10) + Math.floor(level/5)*5 -9;
+		public static function levelCurve(...rest) {
+			var lvl:int;
+			if(rest[0]) lvl = rest[0];
+			else lvl = level;
+			if (lvl < 3) return lvl*3;
+			if (lvl == 3) return 10;
+			else return 5*Math.floor(lvl/4) + levelCurve(lvl-1);
 		}
 	}
 	

@@ -365,14 +365,23 @@
 			if (BlockMerchant.current == null) {
 				var b:Block;
 				var p = BlockMerchant.playset;
-				if(BlockMerchant.nextBlock) {
-					b = new Block(BlockMerchant.nextBlock);				
+				if(BlockMerchant.nextBlocks[0]) {
+					b = new Block(BlockMerchant.nextBlocks[0]);	
+					for (var i = 1; i < BlockMerchant.sight; i++) {
+						if (BlockMerchant.nextBlocks[i]) {
+						BlockMerchant.nextBlocks[i-1] = BlockMerchant.nextBlocks[i];
+						}
+						else BlockMerchant.nextBlocks[i-1] = p[Math.floor(Math.random()*p.length)];
+					}
+					BlockMerchant.nextBlocks[BlockMerchant.sight-1] = p[Math.floor(Math.random()*p.length)];
 				}
 				else {
 					b = new Block(p[Math.floor(Math.random()*p.length)]); //random type
+					for (var j = 0; j < BlockMerchant.sight; i++) {
+						BlockMerchant.nextBlocks[j] = p[Math.floor(Math.random()*p.length)];
+					}
 				}
 				
-				BlockMerchant.nextBlock = p[Math.floor(Math.random()*p.length)];
 				stage.addChild(b);
 				b.setKeyListener(stage);
 				b.gx = 5;

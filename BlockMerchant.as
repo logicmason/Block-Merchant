@@ -25,7 +25,10 @@
 		static var isKeyPressed:Array = new Array;
 		static var current:Block = null;
 		static var nextBlock:String; //the name of the type of the next block
+		static var nextBlocks:Array = new Array();
 		static var nextBlockImage:Block = null; // the display of the next block
+		static var nextBlockImages:Array = new Array();
+		static var sight:int = 0; //how many next blocks you can see (don't surpass 3)
 		static var board:Board;
 		static var shop:MovieClip;
 		static var pigPic:MovieClip;
@@ -72,7 +75,7 @@
 		public function onConnectError(status:String):void {
 		// handle error here...
 			trace("couldn't connect to Mochi API");
-			if(!gameInitialized) {initializeGame();}
+			//if(!gameInitialized) {initializeGame();}
 		}
 		public function BlockMerchant() {
 			bmLink = this;
@@ -83,7 +86,7 @@
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.11"
+			introScreen.version.text = "1.13"
 			board = new Board();
 			Board.stageLink = stage;
 			boardLink = board;
@@ -161,8 +164,13 @@
 			musicChannel = music.play(0,1000);
 		}
 		static function gameOver() {
-			nextBlockImage.parent.removeChild(nextBlockImage);
-			nextBlockImage.destroy();
+			//nextBlockImage.parent.removeChild(nextBlockImage);
+			//nextBlockImage.destroy();
+			
+			for (var i in nextBlockImages) {
+				nextBlockImages[i].parent.removeChild(nextBlockImages[i]);
+				nextBlockImages[i].destroy();
+			}
 			pigPic.visible = true;
 			var p = gameOverMessage.parent;
 			p.setChildIndex(gameOverMessage, p.numChildren -1);
@@ -172,8 +180,6 @@
 			musicChannel.stop();
 			
 			submitStats();
-			//p = bmLink.parent;
-			//p.setChildIndex(bmLink, p.numChildren-1); //move blockMerchant obj to top
 			MochiScores.showLeaderboard({boardID: boardID, score: Board.points, 									
 				onDisplay: function () { onLeaderboardDisplay()}, 
 				onClose: function () { onLeaderboardClose()} });
@@ -193,6 +199,7 @@
 		}
 		static function onLeaderboardError() {
 			trace("Leaderboard Error");
+			onLeaderboardClose()
 		}
 		function randomizePlayset() {
 			playset = [];
@@ -206,12 +213,14 @@
 		}
 		function startGame() {
 			board.initialize();
+			Board.money = 50;
 			shop.visible = false;
 			shop.visits = 0;
 			pigPic.visible = false;
 			gameOverMessage.visible = false;
 			//randomizePlayset();
 			playset = startingSet.slice(0);
+			sight = 0;
 			endLevel();
 			if (playset.length > 0) {
 				current = new Block(playset[Math.floor(Math.random()*playset.length)]);
@@ -221,26 +230,35 @@
 				current.gx = 4;
 				current.gy = 0;
 				displayPlayset();
-				nextBlock = playset[Math.floor(Math.random()*playset.length)];
+				//nextBlock = playset[Math.floor(Math.random()*playset.length)];
+				
+				nextBlocks = [];
+				for (var i = 0; i < sight; i++) {
+					nextBlocks.push(playset[Math.floor(Math.random()*playset.length)]);
+				}
+				displayNextBlock();
 			}
 			
 			//loopMusic(music1);
 		}
 		
 		static function displayNextBlock() {
-			if (nextBlock) {
-				//trace("nextBlock is... " + nextBlock);
-				if (nextBlockImage) {
-					if(nextBlockImage.parent) nextBlockImage.parent.removeChild(nextBlockImage);
-					nextBlockImage.destroy();
+			if (sight==0) bmLink.nextBlockText.text = "You can't see the \nnext block!";
+			if (sight==1) bmLink.nextBlockText.text = "Next Block";
+			if (sight==2) bmLink.nextBlockText.text = "Next 2 Blocks (spyglass)";
+			if (sight==3) bmLink.nextBlockTest.text = "Next 3 Blocks (telescope)";
+			for (var i=0; i < sight; i++) {
+				if (nextBlocks[i]) {
+					if (nextBlockImages[i]) {
+						if(nextBlockImages[i].parent) nextBlockImages[0].parent.removeChild(nextBlockImages[i]);
+						nextBlockImages[i].destroy();
+					}
+					nextBlockImages[i] = new Block(nextBlocks[i]);
+					nextBlockImages[i].makeSpecial();
+					Board.stageLink.addChild(nextBlockImages[i]);
+					nextBlockImages[i].x = 330 + i*80 - (nextBlocks.length-1)*40;
+					nextBlockImages[i].y = 40;
 				}
-				nextBlockImage = new Block(nextBlock);
-				nextBlockImage.makeSpecial();
-				Board.stageLink.addChild(nextBlockImage);
-				nextBlockImage.height *= 1;
-				nextBlockImage.width *= 1;
-				nextBlockImage.x = 330;
-				nextBlockImage.y = 40;
 			}
 		}
 		function displayPlayset() {
@@ -272,7 +290,6 @@
 			Board.linesRemaining = Board.levelCurve()-Board.linesCleared;
 			if (current) current.removeEventListener("enterFrame", current.move);
 			clearPlayset();
-			trace("shop.parent: "+shop.parent);
 			shop.visible = true;
 			shop.visits += 1;
 			shop.parent.setChildIndex(shop, shop.parent.numChildren-1);
@@ -292,7 +309,6 @@
 			shop.visible = false;
 			shop.clearDeals();
 			shop.clearText();
-			trace(shop.textList.length);
 					for (var item in shop.textList) {
 						trace(item+": "+shop.textList[item].toString);
 					}
@@ -306,8 +322,13 @@
 				current.gx = 4;
 				current.gy = 0;
 			}
-			nextBlock = playset[Math.floor(Math.random()*playset.length)];
+			
 			displayPlayset();
+			nextBlocks = [];
+			for (var i = 0; i < sight; i++) {
+				nextBlocks.push(playset[Math.floor(Math.random()*playset.length)]);
+			}
+			displayNextBlock();
 			loopMusic(music1);
 			//pause();
 		}
