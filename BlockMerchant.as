@@ -246,7 +246,7 @@
 			if (sight==0) bmLink.nextBlockText.text = "You can't see the \nnext block!";
 			if (sight==1) bmLink.nextBlockText.text = "Next Block";
 			if (sight==2) bmLink.nextBlockText.text = "Next 2 Blocks (spyglass)";
-			if (sight==3) bmLink.nextBlockTest.text = "Next 3 Blocks (telescope)";
+			if (sight==3) bmLink.nextBlockText.text = "Next 3 Blocks (telescope)";
 			for (var i=0; i < sight; i++) {
 				if (nextBlocks[i]) {
 					if (nextBlockImages[i]) {

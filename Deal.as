@@ -149,6 +149,7 @@
 					shop.greeting.text = "Oink! Oink!  Thank you for shopping!";
 					if (special == "orb") { 
 						shop.greeting.text = "Oink!  Oink!  An orb of time!";
+						shop.greeting.appendText("\nThat will slow down gravity!");
 						orbCost *= 2;
 						if (Block.gravity >3) Block.gravity -= 3;
 						else Block.gravity = 1;
