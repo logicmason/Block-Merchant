@@ -18,6 +18,7 @@
 		static var o:Object = { n: [3, 1, 9, 8, 7, 1, 3, 2, 5, 5, 9, 5, 10, 7, 4, 6], f: function (i:Number,s:String):String { if (s.length == 16) return s; return this.f(i+1,s + this.n[i].toString(16));}};
 		static var boardID:String = o.f(0,"");
 				
+		static var difficulty:String = "";
 		static var masterset:Array = ["T", "Y", "S", "Z", "5", "u", "U", "L", "J", "l", "O", "r", "t", "H"];
 		static var startingSet:Array = [];//["S", "Z", "u", "T", "L", "J"];
 		static var minPlayset = 4;
@@ -86,7 +87,8 @@
 			loadAPI();  // for Kongregate
 		}
 		public function initializeGame() {
-			introScreen.version.text = "1.13"
+			difficulty = "casual";  //this is default
+			introScreen.version.text = "1.15"
 			board = new Board();
 			Board.stageLink = stage;
 			boardLink = board;
@@ -100,7 +102,9 @@
 			pigPic.y = 88;
 			pigPic.visible = false;
 			stage.addChild(pigPic);
-			introScreen.startButton.addEventListener("mouseDown", startButtonHit);
+			//introScreen.startButton.addEventListener("mouseDown", startButtonHit);
+			introScreen.casualButton.addEventListener("mouseDown", casualButtonHit);
+			introScreen.brutalButton.addEventListener("mouseDown", brutalButtonHit);
 			stage.addChild(introScreen);
 			introScreen.creditsButton.addEventListener("mouseDown", creditsButtonHit);
 			creditsScreen.visible = false;
@@ -145,9 +149,25 @@
 			creditsScreen.visible = false;
 			creditsScreen.removeEventListener("mouseDown", closeCreditsHit);
 		}
-		function startButtonHit(e:Event) {
-			introScreen.startButton.removeEventListener("mouseDown", startButtonHit);
-			stage.removeChild(introScreen);
+		//function startButtonHit(e:Event) {
+			//introScreen.startButton.removeEventListener("mouseDown", startButtonHit);
+			//stage.removeChild(introScreen);
+			//instructionScreen.playButton.addEventListener("mouseDown", playButtonHit);
+			//stage.addChild(instructionScreen);
+		//}
+		function casualButtonHit(e:Event) {
+			difficulty = "casual";
+			introScreen.casualButton.removeEventListener("mouseDown", casualButtonHit);
+			introScreen.brutalButton.removeEventListener("mouseDown", brutalButtonHit);
+			stage.removeChild(introScreen)
+			instructionScreen.playButton.addEventListener("mouseDown", playButtonHit);
+			stage.addChild(instructionScreen);
+		}
+		function brutalButtonHit(e:Event) {
+			difficulty = "brutal";
+			introScreen.casualButton.removeEventListener("mouseDown", casualButtonHit);
+			introScreen.brutalButton.removeEventListener("mouseDown", brutalButtonHit);
+			stage.removeChild(introScreen)
 			instructionScreen.playButton.addEventListener("mouseDown", playButtonHit);
 			stage.addChild(instructionScreen);
 		}
@@ -213,7 +233,7 @@
 		}
 		function startGame() {
 			board.initialize();
-			Board.money = 50;
+			//Board.money = 50;
 			shop.visible = false;
 			shop.visits = 0;
 			pigPic.visible = false;
@@ -308,6 +328,7 @@
 		function nextLevel()  {  // may only be called from shop after deals have been displayed
 			shop.visible = false;
 			shop.clearDeals();
+			shop.greetingDisplayed = false;
 			shop.clearText();
 					for (var item in shop.textList) {
 						trace(item+": "+shop.textList[item].toString);
@@ -349,6 +370,8 @@
 			}
 		}
 		static function submitStats() {
+			if (difficulty=="brutal") var isHard = true;
+			else isHard = false;
 			kongregate.stats.submit("score", Board.points);
 			kongregate.stats.submit("gold", Board.money);
 			kongregate.stats.submit("linesCleared", Board.linesCleared);
@@ -361,6 +384,7 @@
 			
 			kongregate.stats.submit("level", Board.level);
 			kongregate.stats.submit("speed", Block.gravity);
+			kongregate.stats.submit("isHard", isHard);
 			//kongregate.stats.submit("playset", playset.toString()); // sends NAN for some reason
 			kongregate.stats.submit("gameComplete", gameComplete);
 		}

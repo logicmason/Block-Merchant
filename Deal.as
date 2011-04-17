@@ -82,22 +82,22 @@
 					
 					var o = new Orb();
 					stage.addChild(o);
-					o.x = 355;
-					o.y = 75+placement*50;
+					o.x = 375;
+					o.y = 100+placement*50;
 					components.push(o);
 				}
 				if (special == "spyglass") { //spyglass gives sight range of 2
-					var s = new Orb();
+					var s = new Spyglass();
 					stage.addChild(s);
-					s.x = 355;
-					s.y = 75+placement*50;
+					s.x = 375;
+					s.y = 100+placement*50;
 					components.push(s);
 				}
 				if (special == "telescope") { //telescope gives sight range of 3
 					s = new Orb();
 					stage.addChild(s);
-					s.x = 355;
-					s.y = 75+placement*50;
+					s.x = 375;
+					s.y = 100+placement*50;
 					components.push(s);
 				}
 			}

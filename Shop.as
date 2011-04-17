@@ -10,6 +10,7 @@
 	
 	public class Shop extends MovieClip{
 		var dealsDisplayed:Boolean = false;
+		var greetingDisplayed:Boolean = false;
 		var deals:Array = []; // this is where data for generating the deals is kept
 		var dealList:Array = []; // an array of deal objects
 		var textList:Array = [];
@@ -18,34 +19,9 @@
 		static var inventoryFormat = new TextFormat();
 		var visits:int = 0; // incremented in BlockMerchant.as endLevel()
 		var dealBubble = new Sprite();
-		var masterDealList:Array = [[["U","Y"], 0],
-									[["u","H"], 0],
-									[["L","J"], 4], 
-									[["S","Z"], 3],
-									[["T","u"], 2],
-									[["t","r"], 1],
-									[["l","Y"], 4],
-									[["l","O"], 6],
-									[["5","H"], 7],
-									[["U","T"], 2],
-									[["T","O"], 4],
-									[["t","5"], 4]
-									];
-		var masterSaleList:Array = [[["r"], 1],
-									[["T"], 2],
-									[["Z"], 3],
-									[["S"], 3],
-									[["L"], 2],
-									[["J"], 2],
-									[["l"], 1],
-									[["O"], 2],
-									[["u"], 3],
-									[["U"], 4],
-									[["H"], 5],
-									[["t"], 6],
-									[["Y"], 4],
-									[["5"], 3]
-									];
+		var masterDealList:Array = [];
+		var masterSaleList:Array = [];
+		
 		public function Shop() {
 			// constructor code
 			salesFormat.size = 15;
@@ -98,7 +74,7 @@
 				deals.push([[],[],Deal.spyglassCost, "spyglass"]);
 			}
 			if (BlockMerchant.sight == 2) {
-				deals.push([[],[],Deal.telescopeCost, "telescope"]);
+				//deals.push([[],[],Deal.telescopeCost, "telescope"]);
 			}
 			if (Board.money > 10) {
 				deals.push([[],[],Deal.orbCost, "orb"]); //orb of time
@@ -138,7 +114,8 @@
 			if (this.visible == true) {
 				gold.text = Board.money.toString();
 				if((dealsDisplayed == false)) {
-					if (visits == 1) {
+					if ((visits == 1 )&&(greetingDisplayed == false)) {
+						createPriceList();
 						greeting.text = "Greetings piglet!  First you'll need to buy some blocks!";
 						greeting.appendText("\nI only sell them in sets of two.");
 					} else if (visits ==2) {
@@ -152,6 +129,7 @@
 					} else {
 						greeting.text = "Oink! Oink!  Welcome to my block shop!";
 					}
+					greetingDisplayed = true;
 				}
 				// L leaves (function in BlockMerchant.as)
 				if(Key.isDown(82)) { //r
@@ -217,6 +195,69 @@
 				b.y = Math.floor(i/2)*70+150;
 			}
 		}
+		function createPriceList() {
+			if (BlockMerchant.difficulty == "casual") {
+				masterDealList = [
+										[["u","O"], 0],
+										[["L","J"], 3], 
+										[["S","Z"], 2],
+										[["T","u"], 1],
+										[["t","r"], 0],
+										[["l","Y"], 3],
+										[["l","O"], 5],
+										[["5","H"], 6],
+										[["U","T"], 1],
+										[["T","O"], 2],
+										[["t","5"], 3]
+										];
+				masterSaleList = [[["r"], 1],
+										[["T"], 2],
+										[["Z"], 2],
+										[["S"], 2],
+										[["L"], 2],
+										[["J"], 2],
+										[["l"], 1],
+										[["O"], 2],
+										[["u"], 2],
+										[["U"], 3],
+										[["H"], 4],
+										[["t"], 5],
+										[["Y"], 4],
+										[["5"], 2]
+										];
+			}
+			if (BlockMerchant.difficulty == "brutal"){
+				masterDealList = [[["U","Y"], 0],
+									[["u","H"], 0],
+									[["L","J"], 4], 
+									[["S","Z"], 3],
+									[["T","u"], 2],
+									[["t","r"], 1],
+									[["l","Y"], 4],
+									[["l","O"], 6],
+									[["5","H"], 7],
+									[["U","T"], 2],
+									[["T","O"], 3],
+									[["t","5"], 4]
+									];
+		
+		 		masterSaleList = [[["r"], 1],
+									[["T"], 2],
+									[["Z"], 3],
+									[["S"], 3],
+									[["L"], 2],
+									[["J"], 2],
+									[["l"], 1],
+									[["O"], 2],
+									[["u"], 3],
+									[["U"], 4],
+									[["H"], 5],
+									[["t"], 6],
+									[["Y"], 4],
+									[["5"], 3]
+									];
+				}
+		}// create price list function
 
 	}
 	
