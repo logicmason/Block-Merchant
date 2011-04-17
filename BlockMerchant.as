@@ -88,7 +88,7 @@
 		}
 		public function initializeGame() {
 			difficulty = "casual";  //this is default
-			introScreen.version.text = "1.15"
+			introScreen.version.text = "1.16"
 			board = new Board();
 			Board.stageLink = stage;
 			boardLink = board;
@@ -109,6 +109,7 @@
 			introScreen.creditsButton.addEventListener("mouseDown", creditsButtonHit);
 			creditsScreen.visible = false;
 			stage.addChild(creditsScreen);
+			mainMenuButton.addEventListener("mouseDown", toMainMenu);
 			
 			messageFormat.size = 16;
 			messageFormat.align = "center";
@@ -149,12 +150,19 @@
 			creditsScreen.visible = false;
 			creditsScreen.removeEventListener("mouseDown", closeCreditsHit);
 		}
-		//function startButtonHit(e:Event) {
-			//introScreen.startButton.removeEventListener("mouseDown", startButtonHit);
-			//stage.removeChild(introScreen);
-			//instructionScreen.playButton.addEventListener("mouseDown", playButtonHit);
-			//stage.addChild(instructionScreen);
-		//}
+		function toMainMenu(e:Event) {
+			//clean up the game in progress if there is one
+			for (var i in nextBlockImages) {
+				nextBlockImages[i].parent.removeChild(nextBlockImages[i]);
+				nextBlockImages[i].destroy();
+			}
+			musicChannel.stop();
+			
+			introScreen.casualButton.addEventListener("mouseDown", casualButtonHit);
+			introScreen.brutalButton.addEventListener("mouseDown", brutalButtonHit);
+			stage.addChild(introScreen);
+			//introScreen.creditsButton.addEventListener("mouseDown", creditsButtonHit);
+		}
 		function casualButtonHit(e:Event) {
 			difficulty = "casual";
 			introScreen.casualButton.removeEventListener("mouseDown", casualButtonHit);
