@@ -113,6 +113,10 @@
 		function enterFrame(e:Event){
 			if (this.visible == true) {
 				gold.text = Board.money.toString();
+				shopBuy.text = "B)uy";
+				shopDestroy.text = "D)estroy";
+				shopInventory.text = "I)nventory";
+				shopLeave.text = "L)eave";
 				if((dealsDisplayed == false)) {
 					if ((visits == 1 )&&(greetingDisplayed == false)) {
 						createPriceList();

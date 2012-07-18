@@ -81,10 +81,14 @@
 		public function BlockMerchant() {
 			bmLink = this;
 			
-			var _mochiads_game_id:String = "701defcb37bf8dbc";
-			mochi.as3.MochiServices.connect("701defcb37bf8dbc", bmLink, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
+			//var _mochiads_game_id:String = "701defcb37bf8dbc";
 			//MochiAd.showPreGameAd({clip:root, id:"dcbe9b807ff7322e", res:"600x300", ad_finished: initializeGame});
-			loadAPI();  // for Kongregate
+
+			//mochi.as3.MochiServices.connect("701defcb37bf8dbc", bmLink, onConnectError);  // use mochi.as2.MochiServices.connect for AS2 API
+			//loadAPI();  // for Kongregate
+			//uncomment 2 lines above and kong stuff in updateScore and delete
+			initializeGame();
+			
 		}
 		public function initializeGame() {
 			difficulty = "casual";  //this is default
@@ -207,10 +211,10 @@
 			//trace(Block.list.length + "total blocks");
 			musicChannel.stop();
 			
-			submitStats();
-			MochiScores.showLeaderboard({boardID: boardID, score: Board.points, 									
-				onDisplay: function () { onLeaderboardDisplay()}, 
-				onClose: function () { onLeaderboardClose()} });
+			//submitStats();
+			//MochiScores.showLeaderboard({boardID: boardID, score: Board.points, 									
+				//onDisplay: function () { onLeaderboardDisplay()}, 
+				//onClose: function () { onLeaderboardClose()} });
 		}
 		
 		static function onLeaderboardDisplay() {
@@ -315,6 +319,7 @@
 		static function endLevel(){
 			Board.level += 1;
 			Block.gravity += 1;
+			if (difficulty == "casual") if (Board.level <4) Block.gravity =1;
 			Board.linesRemaining = Board.levelCurve()-Board.linesCleared;
 			if (current) current.removeEventListener("enterFrame", current.move);
 			clearPlayset();
@@ -327,7 +332,7 @@
 			if(!musicChannel.hasEventListener(Event.SOUND_COMPLETE)) {
 				musicChannel.addEventListener( Event.SOUND_COMPLETE, musicComplete );
 			}
-			submitStats();
+			//submitStats();
 			
 		}
 		static function musicComplete (e : Event) : void {
